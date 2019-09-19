@@ -3,6 +3,8 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
+import lesson1.task1.sqr
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
@@ -63,7 +65,11 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String {
+    if ((age in 1..4 || age in 20..110 || age in 120..199) && (age % 10 == 1)) return "$age год"
+    if ((age in 1..4 || age in 20..199 || age in 120..199) && (age % 10 in 2..4)) return "$age года"
+    else return "$age лет"
+}
 
 /**
  * Простая
@@ -76,12 +82,21 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double = TODO()
+): Double {
+    val s = v1 * t1 + v2 * t2 + v3 * t3
+    return when {
+        (v1 * t1) >= (s / 2) -> (s / (2 * v1))
+        ((v1 * t1) + (v2 * t2)) >= (s / 2) -> (t1 + ((s / 2) - v1 * t1) / v2)
+        else -> (t1 + t2 + (((s / 2) - v1 * t1 - v2 * t2) / v3))
+    }
+}
 
 /**
  * Простая
  *
- * Нa шахматной доске стоят черный король и две белые ладьи (ладья бьет по горизонтали и вертикали).
+ * Нa шахматной доске стоят чер
+}
+}ный король и две белые ладьи (ладья бьет по горизонтали и вертикали).
  * Определить, не находится ли король под боем, а если есть угроза, то от кого именно.
  * Вернуть 0, если угрозы нет, 1, если угроза только от первой ладьи, 2, если только от второй ладьи,
  * и 3, если угроза от обеих ладей.
@@ -91,7 +106,12 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int = when {
+    ((kingX == rookX1) || (kingY == rookY1)) && ((kingX == rookX2) || (kingY == rookY2)) -> 3
+    ((kingX != rookX1) && (kingY != rookY1)) && ((kingX == rookX2) || (kingY == rookY2)) -> 2
+    ((kingX != rookX2) && (kingY != rookY2)) && ((kingX == rookX1) || (kingY == rookY1)) -> 1
+    else -> 0
+}
 
 /**
  * Простая
@@ -107,7 +127,15 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int = when {
+    ((kingX == rookX) || (kingY == rookY)) && ((kingX != bishopX) &&
+            (kingY != bishopY) && (abs((bishopX - kingX) % (bishopY - kingY)) == 0)) -> 3
+    ((kingX == rookX) || (kingY == rookY)) && ((kingX != bishopX) &&
+            (kingY != bishopY) && (abs((bishopX - kingX) % (bishopY - kingY)) != 0)) -> 1
+    ((kingX != rookX) || (kingY != rookY)) && ((kingX != bishopX) &&
+            (kingY != bishopY) && (abs((bishopX - kingX) % (bishopY - kingY)) == 0)) -> 2
+    else -> 0
+}
 
 /**
  * Простая
@@ -117,7 +145,17 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int = when {
+    ((a + b) < c) || ((a + c) < b) || ((c + b) < a) -> -1
+    ((((a * a + b * b - c * c) / (2 * a * b)) < 0) || (((a * a + c * c - b * b) / 2 * a * c) < 0) ||
+            ((c * c + b * b - a * a) / (2 * b * c) < 0)) -> 2
+
+    ((a * a + b * b) == (c * c)) || ((a * a + c * c) == (b * b)) || ((c * c + b * b) == (a * a)) -> 1
+
+
+    else -> 0
+
+}
 
 /**
  * Средняя
@@ -127,4 +165,10 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = when {
+    ((b >= d) && (d >= a) && (a >= c)) -> (d - a)
+    ((d >= b) && (b >= c) && (c >= a)) -> (b - c)
+    ((b >= d) && (c >= a)) -> (d - c)
+    ((d >= a) && (a >= c)) -> (b - a)
+    else -> -1
+}
