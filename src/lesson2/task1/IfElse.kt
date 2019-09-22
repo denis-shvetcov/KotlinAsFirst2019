@@ -4,6 +4,8 @@ package lesson2.task1
 
 import lesson1.task1.discriminant
 import lesson1.task1.sqr
+import lesson4.task1.abs
+import ru.spbstu.kotlin.generate.combinators.abs
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -66,9 +68,11 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    if ((age in 1..4 || age in 20..110 || age in 120..199) && (age % 10 == 1)) return "$age год"
-    if ((age in 1..4 || age in 20..199 || age in 120..199) && (age % 10 in 2..4)) return "$age года"
-    else return "$age лет"
+    return when {
+        ((age in 1..4 || age in 20..110 || age in 120..199) && (age % 10 == 1)) -> "$age год"
+        ((age in 1..4 || age in 20..110 || age in 120..199) && (age % 10 in 2..4)) -> "$age года"
+        else -> "$age лет"
+    }
 }
 
 /**
@@ -94,9 +98,7 @@ fun timeForHalfWay(
 /**
  * Простая
  *
- * Нa шахматной доске стоят  чер
-}
-}ный король и две белые ладьи (ладья бьет по горизонтали и вертикали).
+ * Нa шахматной доске стоят  черный король и две белые ладьи (ладья бьет по горизонтали и вертикали).
  * Определить, не находится ли король под боем, а если есть угроза, то от кого именно.
  * Вернуть 0, если угрозы нет, 1, если угроза только от первой ладьи, 2, если только от второй ладьи,
  * и 3, если угроза от обеих ладей.
@@ -107,9 +109,9 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int = when {
-    ((kingX == rookX1) || (kingY == rookY1)) && ((kingX == rookX2) || (kingY == rookY2)) -> 3
-    ((kingX != rookX1) && (kingY != rookY1)) && ((kingX == rookX2) || (kingY == rookY2)) -> 2
-    ((kingX != rookX2) && (kingY != rookY2)) && ((kingX == rookX1) || (kingY == rookY1)) -> 1
+    (kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2) -> 3
+    (kingX != rookX1 && kingY != rookY1) && (kingX == rookX2 || kingY == rookY2) -> 2
+    (kingX != rookX2 && kingY != rookY2) && (kingX == rookX1 || kingY == rookY1) -> 1
     else -> 0
 }
 
@@ -128,12 +130,12 @@ fun rookOrBishopThreatens(
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
 ): Int = when {
-    ((kingX == rookX) || (kingY == rookY)) && ((kingX != bishopX) &&
-            (kingY != bishopY) && (abs((bishopX - kingX) % (bishopY - kingY)) == 0)) -> 3
-    ((kingX == rookX) || (kingY == rookY)) && ((kingX != bishopX) &&
-            (kingY != bishopY) && (abs((bishopX - kingX) % (bishopY - kingY)) != 0)) -> 1
-    ((kingX != rookX) || (kingY != rookY)) && ((kingX != bishopX) &&
-            (kingY != bishopY) && (abs((bishopX - kingX) % (bishopY - kingY)) == 0)) -> 2
+    (kingX == rookX || kingY == rookY) && (kingX != bishopX &&
+            kingY != bishopY && (abs((bishopX - kingX) % (bishopY - kingY)) == 0)) -> 3
+    (kingX == rookX || kingY == rookY) && (kingX != bishopX &&
+            kingY != bishopY && (abs((bishopX - kingX) % (bishopY - kingY)) != 0)) -> 1
+    (kingX != rookX && kingY != rookY) && (kingX != bishopX &&
+            kingY != bishopY && (abs((bishopX - kingX) % (bishopY - kingY)) == 0)) -> 2
     else -> 0
 }
 
