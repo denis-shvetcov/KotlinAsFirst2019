@@ -159,7 +159,7 @@ fun maxDivisor(n: Int): Int {
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
     if ((m % 2 == 0) && (n % 2 == 0)) return false
-    if (m == n) return false
+    if ((m == n) && (m != 1) && (m != 1)) return false
     if (m > n) {
         for (i in 3..n) {
             if (((m % i) == 0) && ((n % i) == 0)) return false
@@ -393,25 +393,25 @@ fun fibSequenceDigit(n: Int): Int {
     if ((n == 1) || (n == 2)) return 1
     var i = 2
     var fib = 0
-    var sumcount = 2 //кол-во цифр в ряду
-    var last = 0 //n-ная цифра
+    var sumcount = 2
+    var last = 0
     var count = 0
     var temp = 0
-    var counttemp = 0//колво цифр в числе, при котором sumcount>=n
+    var counttemp = 0
     while (sumcount < n) {
         i += 1
-        fib = fib(i) // нынешный член из ряда
-        temp = fib(i) // запоминаем значение
+        fib = fib(i)
+        temp = fib(i)
         count = 0
         while (fib > 0) {
             fib /= 10
             sumcount++
-            count++ //кол-во сокращенных цифр с конца
+            count++
             if (sumcount == n) break
         }
-        counttemp = count //кол-во сокращенных цифр с конца
+        counttemp = count
     }
-    count = digitNumber(temp) //кол-во цифр в числе, на котором обрывается цикл
+    count = digitNumber(temp)
     last = temp / (10.0.pow(count - counttemp).toInt()) % 10
     return last
 }
