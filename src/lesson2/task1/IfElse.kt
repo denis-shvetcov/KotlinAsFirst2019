@@ -3,9 +3,6 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
-import lesson1.task1.sqr
-import lesson4.task1.abs
-import ru.spbstu.kotlin.generate.combinators.abs
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -108,11 +105,13 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = when {
-    (kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2) -> 3
-    (kingX != rookX1 && kingY != rookY1) && (kingX == rookX2 || kingY == rookY2) -> 2
-    (kingX != rookX2 && kingY != rookY2) && (kingX == rookX1 || kingY == rookY1) -> 1
-    else -> 0
+): Int {
+    val a = rookX1 == kingX || rookY1 == kingY
+    val b = rookX2 == kingX || rookY2 == kingY
+    if (a) {
+        return if (b) 3 else 1
+    }
+    return if (b) 2 else 0
 }
 
 /**
@@ -129,12 +128,15 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = when {
-    (rookX == kingX || rookY == kingY) && ((abs((kingX - bishopX) %  (kingY - bishopY))) == 0) -> 3
-    (rookX != kingX && rookY != kingY) && ((abs((kingX - bishopX) % (kingY - bishopY))) == 0) -> 2
-    (rookX == kingX || rookY == kingY) && ((abs((kingX - bishopX) % (kingY - bishopY))) != 0) -> 1
-    else -> 0
+): Int {
+    val a = rookX == kingX || rookY == kingY
+    val b = abs(kingX - bishopX) == abs(kingY - bishopY)
+    if (a) {
+        return if (b) 3 else 1
+    }
+    return if (b) 2 else 0
 }
+
 
 /**
  * Простая
@@ -151,9 +153,7 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = when {
 
     ((a * a + b * b) == (c * c)) || ((a * a + c * c) == (b * b)) || ((c * c + b * b) == (a * a)) -> 1
 
-
     else -> 0
-
 }
 
 /**

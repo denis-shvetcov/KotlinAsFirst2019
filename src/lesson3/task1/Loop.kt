@@ -73,7 +73,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
 fun digitNumber(n: Int): Int {
     var x = n
     var count = 0
-    while (x > 0) {
+    while (x != 0) {
         count++
         x /= 10
     }
@@ -108,9 +108,9 @@ fun lcm(m: Int, n: Int): Int {
     var x = m
     var y = n
     while (x != y) {
-        if (x > y) x = x - y else y = y - x
+        if (x > y) x -= y else y -= x
     }
-    var nod = x
+    val nod = x
     var nok = 0
     nok = m * n / nod
     return nok
@@ -123,10 +123,9 @@ fun lcm(m: Int, n: Int): Int {
  */
 fun minDivisor(n: Int): Int {
     if (n % 2 == 0) return 2
-    var x = n
     var min = n
     for (i in 3..(n / 2)) {
-        if (x % i == 0) {
+        if (n % i == 0) {
             min = i
             break
         }
@@ -159,7 +158,8 @@ fun maxDivisor(n: Int): Int {
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
     if ((m % 2 == 0) && (n % 2 == 0)) return false
-    if ((m == n) && (m != 1) && (m != 1)) return false
+    if ((m == n) && (m != 1) && (n != 1)) return false
+    if ((m == 1) && (n == 1)) return true
     if (m > n) {
         for (i in 3..n) {
             if (((m % i) == 0) && ((n % i) == 0)) return false
@@ -179,8 +179,8 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
-    var a = m
-    var b = n
+    val a = m
+    val b = n
     for (i in a..b) {
         if (sqrt(i.toDouble()) > sqrt(i.toDouble()).toInt()) continue else return true
     }
@@ -230,14 +230,14 @@ fun collatzSteps(x: Int): Int {
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double {
-    var l = x % (2 * PI)
+    val l = x % (2 * PI)
     var sin = 0.0
     var a = 1
-    var b = 1
-    while (l.pow(a) / factorial(b) >= eps) {
-        if ((a - 1) % 4 == 0) sin += l.pow(a) / factorial(b) else sin -= l.pow(a) / factorial(b)
+
+    while (abs(l.pow(a) / factorial(a)) >= eps) {
+        if ((a - 1) % 4 == 0) sin += l.pow(a) / factorial(a) else sin -= l.pow(a) / factorial(a)
         a += 2
-        b += 2
+
     }
     return sin
 }
@@ -253,7 +253,7 @@ fun sin(x: Double, eps: Double): Double {
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double {
-    var l = x % (2 * PI)
+    val l = x % (2 * PI)
     var cos = 1.0
     var a = 2
     var b = 2
@@ -273,9 +273,9 @@ fun cos(x: Double, eps: Double): Double {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun revert(n: Int): Int {
-    var a = 0.0
+    var a = 0
     var x = n
-    var new = 0.0
+    var new = 0
     var count = 0
     while (x > 0) {
         x /= 10
@@ -283,12 +283,12 @@ fun revert(n: Int): Int {
     }
     x = n
     for (i in 1..count) {
-        a = (x % 10) * 10.0.pow(count - i)
+        a = (x % 10) * 10.0.pow(count - i).toInt()
         new += a
         x /= 10
     }
 
-    return new.toInt()
+    return new
 }
 
 /**
@@ -307,12 +307,12 @@ fun isPalindrome(n: Int): Boolean {
         x /= 10
         count++
     }
-    var s = n
+    val s = n
     var first = 0
     if ((n >= 0) && (n <= 9)) return true
     for (i in 1..(count / 2)) {
         first = ((s / (10.0.pow(count - i))).toInt() % 10)
-        if (((s / (10.0.pow(i - 1))) % 10).toInt() == first) continue else return false
+        if (((s / (10.0.pow(i - 1))) % 10).toInt() != first) return false
     }
     return true
 }
