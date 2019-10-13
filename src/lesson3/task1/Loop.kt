@@ -89,13 +89,13 @@ fun digitNumber(n: Int): Int {
 fun fib(n: Int): Int {
     var a = 1
     var b = 1
-    var c = 0
-    for (i in 1..n - 2) {
+    var c = 1
+    for (i in 3..n) {
         c = a + b
         b = a
         a = c
     }
-    return if ((n == 1) || (n == 2)) 1 else c
+    return c
 }
 
 /**
@@ -179,9 +179,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
-    val a = m
-    val b = n
-    for (i in a..b) {
+    for (i in m..n) {
         if (sqrt(i.toDouble()) > sqrt(i.toDouble()).toInt()) continue else return true
     }
     return false
@@ -273,6 +271,12 @@ fun cos(x: Double, eps: Double): Double {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun revert(n: Int): Int {
+    fun pow10(s: Int): Int {
+        var pow = 1
+        for (i in 1..s) pow *= 10
+        return pow
+    }
+
     var a = 0
     var x = n
     var new = 0
@@ -283,7 +287,7 @@ fun revert(n: Int): Int {
     }
     x = n
     for (i in 1..count) {
-        a = (x % 10) * 10.0.pow(count - i).toInt()
+        a = (x % 10) * pow10(count - i)
         new += a
         x /= 10
     }
@@ -301,18 +305,23 @@ fun revert(n: Int): Int {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun isPalindrome(n: Int): Boolean {
+    fun pow10(s: Int): Int {
+        var pow = 1
+        for (i in 1..s) pow *= 10
+        return pow
+    }
+
     var count = 0
     var x = n
     while (x > 0) {
         x /= 10
         count++
     }
-    val s = n
     var first = 0
     if ((n >= 0) && (n <= 9)) return true
     for (i in 1..(count / 2)) {
-        first = ((s / (10.0.pow(count - i))).toInt() % 10)
-        if (((s / (10.0.pow(i - 1))) % 10).toInt() != first) return false
+        first = (n / (pow10(count - i))) % 10
+        if (((n / pow10(i - 1)) % 10) != first) return false
     }
     return true
 }
@@ -353,6 +362,11 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun squareSequenceDigit(n: Int): Int {
+    fun pow10(s: Int): Int {
+        var pow = 1
+        for (i in 1..s) pow *= 10
+        return pow
+    }
     if (n == 1) return 1
     var i = 1
     var sqr = 0
@@ -375,7 +389,7 @@ fun squareSequenceDigit(n: Int): Int {
         counttemp = count //кол-во сокращенных цифр с конца
     }
     count = digitNumber(temp) //кол-во цифр в числе, на котором обрывается цикл
-    last = temp / (10.0.pow(count - counttemp).toInt()) % 10
+    last = temp / (pow10(count - counttemp)) % 10
     return last
 }
 
@@ -390,6 +404,11 @@ fun squareSequenceDigit(n: Int): Int {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun fibSequenceDigit(n: Int): Int {
+    fun pow10(s: Int): Int {
+        var pow = 1
+        for (i in 1..s) pow *= 10
+        return pow
+    }
     if ((n == 1) || (n == 2)) return 1
     var i = 2
     var fib = 0
@@ -412,7 +431,7 @@ fun fibSequenceDigit(n: Int): Int {
         counttemp = count
     }
     count = digitNumber(temp)
-    last = temp / (10.0.pow(count - counttemp).toInt()) % 10
+    last = temp / (pow10(count - counttemp)) % 10
     return last
 }
 

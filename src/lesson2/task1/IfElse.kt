@@ -106,12 +106,12 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int {
-    val a = rookX1 == kingX || rookY1 == kingY
-    val b = rookX2 == kingX || rookY2 == kingY
-    if (a) {
-        return if (b) 3 else 1
+    val rook1kills = rookX1 == kingX || rookY1 == kingY
+    val rook2kills = rookX2 == kingX || rookY2 == kingY
+    if (rook1kills) {
+        return if (rook2kills) 3 else 1
     }
-    return if (b) 2 else 0
+    return if (rook2kills) 2 else 0
 }
 
 /**
@@ -147,11 +147,11 @@ fun rookOrBishopThreatens(
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int = when {
-    ((a + b) < c) || ((a + c) < b) || ((c + b) < a) -> -1
+    ((a + b < c) || (a + c < b) || (c + b < a)) -> -1
     ((((a * a + b * b - c * c) / (2 * a * b)) < 0) || (((a * a + c * c - b * b) / 2 * a * c) < 0) ||
             ((c * c + b * b - a * a) / (2 * b * c) < 0)) -> 2
 
-    ((a * a + b * b) == (c * c)) || ((a * a + c * c) == (b * b)) || ((c * c + b * b) == (a * a)) -> 1
+    (a * a + b * b == c * c) || (a * a + c * c == b * b) || (c * c + b * b == a * a) -> 1
 
     else -> 0
 }
@@ -165,9 +165,9 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = when {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = when {
-    ((b >= d) && (d >= a) && (a >= c)) -> (d - a)
-    ((d >= b) && (b >= c) && (c >= a)) -> (b - c)
-    ((b >= d) && (c >= a)) -> (d - c)
-    ((d >= a) && (a >= c)) -> (b - a)
+    (b >= d && d >= a && a >= c) -> d - a
+    (d >= b && b >= c && c >= a) -> b - c
+    (b >= d && c >= a) -> d - c
+    (d >= a && a >= c) -> b - a
     else -> -1
 }
