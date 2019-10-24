@@ -418,7 +418,7 @@ fun roman(n: Int): String {
             temp += "CD"
         }
         temp += hundreds(x)
-        if (x > 100) x %= 100
+        if (x >= 100) x %= 100
         if (x >= 90) {
             temp += "XC"
             x -= 90
@@ -432,7 +432,7 @@ fun roman(n: Int): String {
             temp += "XL"
         }
         temp += dozens(x)
-        if (x > 10) x %= 10
+        if (x >= 10) x %= 10
         if (x == 9) {
             temp += "IX"
             x -= 9
