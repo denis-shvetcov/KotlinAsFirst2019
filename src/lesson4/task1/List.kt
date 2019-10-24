@@ -6,6 +6,7 @@ import lesson1.task1.discriminant
 import lesson1.task1.sqr
 import lesson3.task1.digitNumber
 import lesson3.task1.isPrime
+import lesson3.task1.pow10
 import lesson3.task1.revert
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -254,6 +255,7 @@ fun convert(n: Int, base: Int): List<Int> {
     var s = mutableListOf<Int>()
     var x = n
     var temp = 0
+    if (n == 0) return listOf(0)
     while (x > 0) {
         s.add(x % base)
         x /= base
@@ -282,6 +284,7 @@ fun convertToString(n: Int, base: Int): String {
     var x = n
     var perem: String = ""
     var temp: String = ""
+    if (n == 1 || n == 0) return n.toString()
     while (x > 0) {
         ost = x % base
         if (ost >= 10) {
@@ -342,65 +345,109 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII,  44 = XLIV, 100 = C
  */
+
+
 fun roman(n: Int): String {
-    var x = n
-    var temp: String = ""
-    if (n >= 4000) roman(n / 1000)
-    while (x > 0) {
-        if (((n / 1000) >= 1) && ((n / 1000) <= 4)) {
-            while (x >= 1000) {
-                temp += "M"
-                x -= 1000
+    fun tisyachi(n: Int): Int {
+        var number = digitNumber(n)
+        var thousands = 0
+        if (n < 4000) return 0 else {
+            while (number > 0) {
+                thousands += 1
+                number -= 3
             }
         }
-        if (x > 900) {
+        return thousands - 1
+    }
+
+    fun thousands(n: Int): String {
+        var x = n
+        var numbers: String = ""
+        while (x >= 1000) {
+            x -= 1000
+            numbers += "M"
+        }
+        return numbers
+    }
+
+    fun hundreds(n: Int): String {
+        var x = n
+        var numbers: String = ""
+        while (x >= 100) {
+            x -= 100
+            numbers += "C"
+        }
+        return numbers
+    }
+
+    fun dozens(n: Int): String {
+        var x = n
+        var numbers: String = ""
+        while (x >= 10) {
+            x -= 10
+            numbers += "X"
+        }
+        return numbers
+    }
+
+    fun units(n: Int): String {
+        var x = n
+        var numbers: String = ""
+        while (x > 0) {
+            numbers += "I"
+            x -= 1
+        }
+        return numbers
+    }
+
+    var temp: String = ""
+    var x = n
+    if (n in 1000..3999) temp += thousands(n)
+    for (i in tisyachi(n) downTo 0) {
+        if (n < 4000) x = n % 1000 else x = n / (1000.0.pow(i).toInt()) % 1000
+        if (x >= 900) {
             temp += "CM"
             x -= 900
-        } else {
-            if ((x < 900) && (x > 500)) {
-                temp += "D"
-                x -= 500
-                while (x > 100) {
-                    x -= 100
-                    temp += "C"
-                }
-            }
         }
-        if (x > 90) {
+        if (x >= 500) {
+            x -= 500
+            temp += "D"
+        }
+        temp += hundreds(x)
+        if (x > 100) x %= 100
+        if (x >= 90) {
             temp += "XC"
             x -= 90
         }
-        if ((x < 90) && (x > 50)) {
-            temp += "L"
+        if (x >= 50) {
             x -= 50
-            while (x >= 10) {
-                temp += "X"
-                x -= 10
-            }
+            temp += "L"
         }
-        if (x > 40) {
-            temp += "XL"
+        if (x >= 40) {
             x -= 40
+            temp += "XL"
         }
+        temp += dozens(x)
+        if (x > 10) x %= 10
         if (x == 9) {
             temp += "IX"
             x -= 9
         }
-        if ((x < 9) && (x > 5)) {
-            temp += "V"
+        if (x >= 5) {
             x -= 5
+            temp += "V"
+            temp += units(x)
+            x = 0
         }
         if (x == 4) {
             temp += "IV"
             x -= 4
         }
-        while (x > 0) {
-            temp += "I"
-            x -= 1
-        }
+        temp += units(x)
     }
     return temp
 }
+
 
 /**
  * Очень сложная
@@ -455,21 +502,17 @@ fun russian(n: Int): String {
     if (x >= 1000) {
         x /= 1000
         if ((x / 100) > 0) {
-            sp += z[(x / (10.0.pow(digitNumber(x) - 1)).toInt()) + 27]
-            x = revert(x)
-            x /= 10
-            x = revert(x)
+            sp += z[x / pow10(digitNumber(x) - 1) + 27]
+            x %= pow10(digitNumber(x) - 1)
             if (x > 0) sp += " " else sp += " тысяч"
         }
         if ((x / 10) >= 2) {
-            sp += z[(x / (10.0.pow(digitNumber(x) - 1)).toInt()) + 18]
-            x = revert(x)
-            x /= 10
-            x = revert(x)
+            sp += z[x / pow10(digitNumber(x) - 1) + 18]
+            x %= pow10(digitNumber(x) - 1)
             if (x > 0) sp += " " else sp += " тысяч"
         }
         if ((x / 10) == 1) {
-            sp += z[(x % (10.0.pow(digitNumber(x) - 1)).toInt()) + 10]
+            sp += z[x % pow10(digitNumber(x) - 1) + 10]
             x /= 100
             sp += " тысяч"
         }
@@ -484,21 +527,17 @@ fun russian(n: Int): String {
     if ((n % 1000 != 0) && (n > 999)) sp += " "
     x = n % 1000
     if ((x / 100) > 0) {
-        sp += z[(x / (10.0.pow(digitNumber(x) - 1)).toInt()) + 27]
-        x = revert(x)
-        x /= 10
-        x = revert(x)
+        sp += z[x / pow10(digitNumber(x) - 1) + 27]
+        x %= pow10(digitNumber(x) - 1)
         if (x > 0) sp += " "
     }
     if ((x / 10) >= 2) {
-        sp += z[(x / (10.0.pow(digitNumber(x) - 1)).toInt()) + 18]
-        x = revert(x)
-        x /= 10
-        x = revert(x)
+        sp += z[x / pow10(digitNumber(x) - 1) + 18]
+        x %= pow10(digitNumber(x) - 1)
         if (x > 0) sp += " "
     }
     if ((x / 10) == 1) {
-        sp += z[(x % (10.0.pow(digitNumber(x) - 1)).toInt()) + 10]
+        sp += z[x % pow10(digitNumber(x) - 1) + 10]
         x /= 100
     }
     if (x > 0) sp += z[x]
