@@ -413,6 +413,10 @@ fun roman(n: Int): String {
             x -= 500
             temp += "D"
         }
+        if (x >= 400) {
+            x -= 400
+            temp += "CD"
+        }
         temp += hundreds(x)
         if (x > 100) x %= 100
         if (x >= 90) {
