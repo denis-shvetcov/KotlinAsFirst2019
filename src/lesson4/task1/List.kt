@@ -7,9 +7,16 @@ import lesson1.task1.sqr
 import lesson3.task1.digitNumber
 import lesson3.task1.isPrime
 import lesson3.task1.pow10
-import lesson3.task1.revert
 import kotlin.math.pow
 import kotlin.math.sqrt
+
+fun powint(x: Int, i: Int): Int {
+    var pow = 1
+    for (k in 1..i) {
+        pow *= x
+    }
+    return pow
+}
 
 /**
  * Пример
@@ -154,7 +161,7 @@ fun mean(list: List<Double>): Double {
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
     if (list.isEmpty()) return list
-    var z = mean(list)
+    val z = mean(list)
     for (i in 0 until list.size) {
         list[i] -= z
     }
@@ -187,7 +194,7 @@ fun times(a: List<Int>, b: List<Int>): Int {
 fun polynom(p: List<Int>, x: Int): Int {
     var sum = 0
     for (i in p.indices) {
-        sum += p[i] * (x.toDouble()).pow(i).toInt()
+        sum += p[i] * powint(x, i)
     }
     return sum
 }
@@ -204,7 +211,6 @@ fun polynom(p: List<Int>, x: Int): Int {
  */
 fun accumulate(list: MutableList<Int>): MutableList<Int> {
     if (list.isEmpty() || list.size == 1) return list
-    var temp = 0
     for (i in 1 until list.size) {
         list[i] = list[i] + list[i - 1]
     }
@@ -222,7 +228,7 @@ fun factorize(n: Int): List<Int> {
     var number = n
     val v = mutableListOf<Int>()
     for (i in 2..n) {
-        if ((n % i == 0) && (isPrime(i))) {
+        if (n % i == 0 && isPrime(i)) {
             while (number % i == 0) {
                 number /= i
                 v.add(i)
@@ -239,10 +245,8 @@ fun factorize(n: Int): List<Int> {
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String {
-    var pr = factorize(n)
-    return pr.joinToString(separator = "*")
-}
+fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
+
 
 /**
  * Средняя
@@ -252,7 +256,7 @@ fun factorizeToString(n: Int): String {
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    var s = mutableListOf<Int>()
+    val s = mutableListOf<Int>()
     var x = n
     var temp = 0
     if (n == 0) return listOf(0)
@@ -282,15 +286,12 @@ fun convert(n: Int, base: Int): List<Int> {
 fun convertToString(n: Int, base: Int): String {
     var ost = 0
     var x = n
-    var perem: String = ""
-    var temp: String = ""
+    var perem = ""
+    var temp = ""
     if (n == 1 || n == 0) return n.toString()
     while (x > 0) {
         ost = x % base
-        if (ost >= 10) {
-            perem = (ost + 87).toChar().toString()
-            temp += perem
-        } else temp += "$ost"
+        if (ost >= 10) temp += (ost + 87).toChar().toString() else temp += "$ost"
         x /= base
     }
     return temp.reversed()
@@ -307,7 +308,7 @@ fun convertToString(n: Int, base: Int): String {
 fun decimal(digits: List<Int>, base: Int): Int {
     var sum = 0
     for (i in digits.indices) {
-        sum += ((digits[i]) * (base.toDouble().pow(digits.size - i - 1))).toInt()
+        sum += digits[i] * powint(base, digits.size - i - 1)
     }
     return sum
 }
@@ -325,11 +326,11 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    var a: Char = 's'
+    var a = 's'
     var sum = 0
     var x = str.reversed()
     while (x.isNotEmpty()) {
-        a = x.last().toChar()
+        a = x.last()
         if (a.toInt() > 80) sum += (a.toInt() - 87) * base.toDouble().pow(x.length - 1).toInt()
         else sum += (a.toInt() - 48) * base.toDouble().pow(x.length - 1).toInt()
         x = x.substring(0, x.length - 1)
@@ -461,89 +462,98 @@ fun roman(n: Int): String {
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val z = mutableListOf<String>(
-        "ноль",//0
-        "один",//1
-        "два",//2
-        "три",//3
-        "четыре",//4
-        "пять",//5
-        "шесть",//6
-        "семь",//7
-        "восемь",//8
-        "девять",//9
-        "десять",//10
-        "одиннадцать",//11
-        "двенадцать",//12
-        "тринадцать",//13
-        "четырнадцать",//14
-        "пятнадцать",//15
-        "шестнадцать",//16
-        "семнадцать",//17
-        "восемнадцать",//18
-        "девятнадцать",//19
-        "двадцать",//20
-        "тридцать",//21
-        "сорок",//22
-        "пятьдесят",//23
-        "шестьдесят",//24
-        "семьдесят",//25
-        "восемьдесят",//26
-        "девяносто",//27
-        "сто",//28
-        "двести",//29
-        "триста",//30
-        "четыреста",//31
-        "пятьсот",//32
-        "шестьсот",//33
-        "семьсот",//34
-        "восемьсот",//35
-        "девятьсот",//36
-        "тысяч"//37
+    val edinici = listOf<String>(
+        "нулевой",
+        "один",
+        "два",
+        "три",
+        "четыре",
+        "пять",
+        "шесть",
+        "семь",
+        "восемь",
+        "девять"
     )
+    val desyatdevyatnadcat = listOf(
+        "десять",
+        "одиннадцать",
+        "двенадцать",
+        "тринадцать",
+        "четырнадцать",
+        "пятнадцать",
+        "шестнадцать",
+        "семнадцать",
+        "восемнадцать",
+        "девятнадцать"
+    )
+    val desyatki = listOf(
+        "нулевой",
+        "десять",
+        "двадцать",
+        "тридцать",
+        "сорок",
+        "пятьдесят",
+        "шестьдесят",
+        "семьдесят",
+        "восемьдесят",
+        "девяносто"
+    )
+    val sotni = listOf(
+        "нулевой",
+        "сто",
+        "двести",
+        "триста",
+        "четыреста",
+        "пятьсот",
+        "шестьсот",
+        "семьсот",
+        "восемьсот",
+        "девятьсот"
+    )
+
     var sp: String = ""
     var x = n
     if (x >= 1000) {
         x /= 1000
         if ((x / 100) > 0) {
-            sp += z[x / pow10(digitNumber(x) - 1) + 27]
+            sp += sotni[x / pow10(digitNumber(x) - 1)]
             x %= pow10(digitNumber(x) - 1)
             if (x > 0) sp += " " else sp += " тысяч"
         }
         if ((x / 10) >= 2) {
-            sp += z[x / pow10(digitNumber(x) - 1) + 18]
+            sp += desyatki[x / pow10(digitNumber(x) - 1)]
             x %= pow10(digitNumber(x) - 1)
             if (x > 0) sp += " " else sp += " тысяч"
         }
         if ((x / 10) == 1) {
-            sp += z[x % pow10(digitNumber(x) - 1) + 10]
+            sp += desyatdevyatnadcat[x % pow10(digitNumber(x) - 1)]
             x /= 100
             sp += " тысяч"
         }
         if (x > 0) {
             if (x == 1) sp += "одна тысяча"
             if (x == 2) sp += "две тысячи"
-            if ((x == 3) || (x % 10 == 4)) sp = sp + z[x] + " тысячи"
-            if ((x >= 5) && (x % 10 <= 9)) sp = sp + z[x] + " тысяч"
+            if ((x == 3) || (x % 10 == 4)) sp = sp + edinici[x] + " тысячи"
+            if ((x >= 5) && (x % 10 <= 9)) sp = sp + edinici[x] + " тысяч"
 
         }
     }
     if ((n % 1000 != 0) && (n > 999)) sp += " "
     x = n % 1000
     if ((x / 100) > 0) {
-        sp += z[x / pow10(digitNumber(x) - 1) + 27]
+        sp += sotni[x / pow10(digitNumber(x) - 1)]
         x %= pow10(digitNumber(x) - 1)
         if (x > 0) sp += " "
     }
     if ((x / 10) >= 2) {
-        sp += z[x / pow10(digitNumber(x) - 1) + 18]
+        sp += desyatki[x / pow10(digitNumber(x) - 1)]
         x %= pow10(digitNumber(x) - 1)
         if (x > 0) sp += " "
     }
     if ((x / 10) == 1) {
-        sp += z[x % pow10(digitNumber(x) - 1) + 10]
+        sp += desyatdevyatnadcat[x % pow10(digitNumber(x) - 1)]
         x /= 100
     }
-    if (x > 0) sp += z[x]
+    if (x > 0) sp += edinici[x]
     return sp
 }
