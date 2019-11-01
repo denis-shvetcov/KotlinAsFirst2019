@@ -268,14 +268,9 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    if (chars.isEmpty() && word.isEmpty()) return true
-    if (chars.isEmpty() && word.isNotEmpty()) return false
-    if (chars.isNotEmpty() && word.isEmpty()) return true
-    chars.map { it.toLowerCase() }
-    for (element in chars) {
-        if (element !in word.toLowerCase()) return false
-    }
-    return true
+    val bukvi = mutableSetOf<Char>()
+    for (letter in 0 until word.length) bukvi.add(word[letter].toLowerCase())
+    return bukvi.intersect(chars.map { it.toLowerCase() }) == bukvi
 }
 
 /**
@@ -362,16 +357,15 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
         all[name]!!.addAll(set)
     }
     while (allold != all) {
+        allold=all
         for ((name, set) in all) {// шаг 3
-            allold = all
             for (element in set) {
                 if (friends.containsKey(element)) tempset += friends[element]!!
             }
             all[name]!!.addAll(tempset)
             tempset.clear()
-
-        }//добавили все рукопожатия (включая лишние)
-    }
+        }
+    }//добавили все рукопожатия (включая лишние)
     for ((name, handshakes) in all) handshakes.removeIf { it == name }//шаг 4
     return all
 }
