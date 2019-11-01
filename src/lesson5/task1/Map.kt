@@ -96,19 +96,15 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val s = mutableMapOf<Int, List<String>>()
     val f = mutableListOf<String>()
-    var maxgrade = 0
-    var mingrade = 0
-    for ((name, grade) in grades) {
-        if (grade > maxgrade) maxgrade = grade
-        if (grade < mingrade) mingrade = grade
-    }
-    for (i in mingrade..maxgrade) {
+    val allgrades = mutableSetOf<Int>()
+    for ((name, grade) in grades) allgrades.add(grade)
+    for (element in allgrades) {
         for ((name, grade) in grades) {
-            if (grade == i) {
+            if (grade == element) {
                 f.add(name)
             }
         }
-        if (f.isNotEmpty()) s.put(i, f.toList())
+        if (f.isNotEmpty()) s.put(element, f.toList())
         f.clear()
     }
     return s
@@ -275,8 +271,9 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     if (chars.isEmpty() && word.isEmpty()) return true
     if (chars.isEmpty() && word.isNotEmpty()) return false
     if (chars.isNotEmpty() && word.isEmpty()) return true
+    chars.map { it.toLowerCase() }
     for (element in chars) {
-        if (element !in word) return false
+        if (element !in word.toLowerCase()) return false
     }
     return true
 }
@@ -352,7 +349,9 @@ fun hasAnagrams(words: List<String>): Boolean {
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     val all = mutableMapOf<String, MutableSet<String>>()
-    val tempset = mutableSetOf<String>() //создан для того, чтобы на третьем шаг не возникали ошибки, при проходке по сету
+    val tempset =
+        mutableSetOf<String>() //создан для того, чтобы на третьем шаг не возникали ошибки, при проходке по сету
+    var allold = mutableMapOf<String, MutableSet<String>>()
     for ((name, set) in friends) { //шаг 1
         all.putIfAbsent(name, mutableSetOf())
         for (element in set) {
@@ -362,13 +361,17 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     for ((name, set) in friends) { //шаг 2
         all[name]!!.addAll(set)
     }
-    for ((name, set) in all) {// шаг 3
-        for (element in set) {
-            if (friends.containsKey(element)) tempset += friends[element]!!
-        }
-        all[name]!!.addAll(tempset)
-        tempset.clear()
-    }//добавили все рукопожатия (включая лишние)
+    while (allold != all) {
+        for ((name, set) in all) {// шаг 3
+            allold = all
+            for (element in set) {
+                if (friends.containsKey(element)) tempset += friends[element]!!
+            }
+            all[name]!!.addAll(tempset)
+            tempset.clear()
+
+        }//добавили все рукопожатия (включая лишние)
+    }
     for ((name, handshakes) in all) handshakes.removeIf { it == name }//шаг 4
     return all
 }
