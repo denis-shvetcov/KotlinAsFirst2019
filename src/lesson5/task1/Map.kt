@@ -2,8 +2,6 @@
 
 package lesson5.task1
 
-import ru.spbstu.wheels.PositiveInfinity
-
 /**
  * Пример
  *
@@ -97,14 +95,14 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val s = mutableMapOf<Int, List<String>>()
     val f = mutableListOf<String>()
     val allgrades = mutableSetOf<Int>()
-    for ((name, grade) in grades) allgrades.add(grade)
+    for (grade in grades.values) allgrades.add(grade)
     for (element in allgrades) {
         for ((name, grade) in grades) {
             if (grade == element) {
                 f.add(name)
             }
         }
-        if (f.isNotEmpty()) s.put(element, f.toList())
+        if (f.isNotEmpty()) s[element] = f.toList()
         f.clear()
     }
     return s
@@ -121,8 +119,8 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    for ((key, value) in a) {
-        if (a[key] == b[key]) continue else return false
+    for (key in a.keys) {
+        if (a[key] != b[key]) return false
     }
     return true
 }
@@ -208,7 +206,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
     val averagelist = mutableMapOf<String, Double>()
     val names = mutableListOf<String>()
-    var a: String = ""
+    var a = ""
     var count = 0
     var sum = 0.0
     for ((name, price) in stockPrices) {
@@ -268,9 +266,9 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    val bukvi = mutableSetOf<Char>()
-    for (letter in 0 until word.length) bukvi.add(word[letter].toLowerCase())
-    return bukvi.intersect(chars.map { it.toLowerCase() }) == bukvi
+    val letters = mutableSetOf<Char>()
+    for (letter in 0 until word.length) letters.add(word[letter].toLowerCase())
+    return letters.intersect(chars.map { it.toLowerCase() }) == letters
 }
 
 /**
@@ -304,7 +302,7 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    if (words.isEmpty()) return false
+    if (words.isEmpty() || words == listOf("")) return false
     val set = mutableSetOf(mutableMapOf<Char, Int>())
     var pair = mutableMapOf<Char, Int>()
     for (word in words) {
@@ -339,10 +337,11 @@ fun hasAnagrams(words: List<String>): Boolean {
  *   ) -> mapOf(
  *          "Marat" to setOf("Mikhail", "Sveta"),
  *          "Sveta" to setOf("Marat", "Mikhail"),
- *          "Mikhail" to setOf("Sveta", "Marat")
+ *          "Mikhail" to setOf("Sveta", "Marat")=
  *        )
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
+    var count = 0
     val all = mutableMapOf<String, MutableSet<String>>()
     val tempset =
         mutableSetOf<String>() //создан для того, чтобы на третьем шаг не возникали ошибки, при проходке по сету
@@ -356,8 +355,9 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     for ((name, set) in friends) { //шаг 2
         all[name]!!.addAll(set)
     }
-    while (allold != all) {
-        allold=all
+    while (count != 2) {// в конце цикла проверяется, изменился ли all, если да, то счетчиу обнуляется, если нет,
+        // то добавляется единица. Если он не изменился дважды, то результат можно выводить
+        allold = all
         for ((name, set) in all) {// шаг 3
             for (element in set) {
                 if (friends.containsKey(element)) tempset += friends[element]!!
@@ -365,6 +365,7 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
             all[name]!!.addAll(tempset)
             tempset.clear()
         }
+        if (allold != all) count = 0 else count++
     }//добавили все рукопожатия (включая лишние)
     for ((name, handshakes) in all) handshakes.removeIf { it == name }//шаг 4
     return all
@@ -388,48 +389,46 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
+fun firstsecondindices(list: List<Int>, first: Int, second: Int): Pair<Int, Int> {//ищет разные индексы для одинаковых элементов
+    var odin = 0
+    var dva = 0
+    for (i in list.indices) {
+        if (list[i] == first) {
+            odin = i
+            break
+        }
+    }
+    for (i in list.indices) {
+        if (list[i] == second && odin != i) {
+            dva = i
+            break
+        }
+    }
+    return Pair(odin, dva)
+}
+
+fun pairsort(pair: Pair<Int, Int>): Pair<Int, Int> {//сортирует пару по возрастанию
+    val first = pair.first
+    val second = pair.second
+    return if (first < second) Pair(first, second) else Pair(second, first)
+}
+
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    fun firstsecondindices(list: List<Int>, first: Int, second: Int): Pair<Int, Int> {
-        var odin = 0
-        var dva = 0
-        for (i in list.indices) {
-            if (list[i] == first) {
-                odin = i
-                break
-            }
-        }
-        for (i in list.indices) {
-            if (list[i] == second && odin != i) {
-                dva = i
-                break
-            }
-        }
-        return Pair(odin, dva)
-    }
-
-    fun pairsort(pair: Pair<Int, Int>): Pair<Int, Int> {
-        val first = pair.first
-        val second = pair.second
-        return if (first < second) Pair(first, second) else Pair(second, first)
-    }
-
-    val chisla = mutableListOf<Int>()
-    for (element in list) {
-        if (chisla.contains(element) && element * 2 == number) return firstsecondindices(
-            list,
-            number,
-            number
-        ) //если есть равные значения и они в 2 раза меньше number
-        if (!chisla.contains(element)) chisla += element
-    }
-    var max = 0
-    var index = 0
-    while (chisla.isNotEmpty()) {
-        max = chisla.max()!!
-        index = chisla.indexOf(max)
-        if (chisla.contains(number - max) && chisla.indexOf(number - max) != index)
-            return pairsort(firstsecondindices(list, number - max, max))
-        chisla.removeAt(index)
+    val newlist = list.sorted()
+    val all = mutableMapOf<Int, Int>()
+    for (i in newlist.indices) all[i] = newlist[i]
+    var frombegin = 0
+    var fromend = list.size - 1
+    if (list.isEmpty()) return Pair(-1, -1)
+    while (frombegin != fromend) {
+        if (all[fromend]!! + all[frombegin]!! == number) return pairsort(
+            firstsecondindices(
+                list,
+                all[frombegin]!!,
+                all[fromend]!!
+            )
+        )
+        if (all[fromend]!! + all[frombegin]!! < number) frombegin++ else fromend--
     }
     return Pair(-1, -1)
 }

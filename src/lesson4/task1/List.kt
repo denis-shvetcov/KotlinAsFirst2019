@@ -10,54 +10,7 @@ import lesson3.task1.pow10
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-val edinici = listOf<String>(
-    "нулевой",
-    "один",
-    "два",
-    "три",
-    "четыре",
-    "пять",
-    "шесть",
-    "семь",
-    "восемь",
-    "девять"
-)
-val desyatdevyatnadcat = listOf(
-    "десять",
-    "одиннадцать",
-    "двенадцать",
-    "тринадцать",
-    "четырнадцать",
-    "пятнадцать",
-    "шестнадцать",
-    "семнадцать",
-    "восемнадцать",
-    "девятнадцать"
-)
-val desyatki = listOf(
-    "нулевой",
-    "десять",
-    "двадцать",
-    "тридцать",
-    "сорок",
-    "пятьдесят",
-    "шестьдесят",
-    "семьдесят",
-    "восемьдесят",
-    "девяносто"
-)
-val sotni = listOf(
-    "нулевой",
-    "сто",
-    "двести",
-    "триста",
-    "четыреста",
-    "пятьсот",
-    "шестьсот",
-    "семьсот",
-    "восемьсот",
-    "девятьсот"
-)
+
 fun powint(x: Int, i: Int): Int {
     var pow = 1
     for (k in 1..i) {
@@ -339,7 +292,7 @@ fun convertToString(n: Int, base: Int): String {
     if (n == 1 || n == 0) return n.toString()
     while (x > 0) {
         ost = x % base
-        if (ost >= 10) temp += (ost + 87).toChar().toString() else temp += "$ost"
+        if (ost >= 10) temp += (ost + 'a'.toInt() - 10).toChar().toString() else temp += "$ost"
         x /= base
     }
     return temp.reversed()
@@ -374,14 +327,20 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    var a = 's'
+    var last = 's'
     var sum = 0
-    var x = str.reversed()
-    while (x.isNotEmpty()) {
-        a = x.last()
-        if (a.toInt() > 80) sum += (a.toInt() - 87) * base.toDouble().pow(x.length - 1).toInt()
-        else sum += (a.toInt() - 48) * base.toDouble().pow(x.length - 1).toInt()
-        x = x.substring(0, x.length - 1)
+    var number = str.reversed()
+    while (number.isNotEmpty()) {
+        last = number.last()
+        if (last.toInt() >= 'a'.toInt()) sum += (last.toInt() - 'a'.toInt() + 10) * powint(
+            base,
+            number.length - 1
+        ) //код 'a'=97, если отнять от кода последней буквы 87, то получим число >9
+        else sum += (last.toInt() - '0'.toInt()) * powint(
+            base,
+            number.length - 1
+        )//код нуля в ASCII-48, а 48- разница м-ду кодами начала букв a,b,c... и началом кодов десятичных цифр
+        number = number.substring(0, number.length - 1)
     }
     return sum
 }
@@ -449,52 +408,54 @@ fun roman(n: Int): String {
         return numbers
     }
 
+    val rim = listOf("CM", "D", "CD", "XC", "L", "XL", "IX", "V", "IV")
+    val des = listOf(900, 500, 400, 90, 50, 40, 9, 5, 4)
     var temp: String = ""
     var x = n
     if (n in 1000..3999) temp += thousands(n)
     for (i in tisyachi(n) downTo 0) {
         if (n < 4000) x = n % 1000 else x = n / (1000.0.pow(i).toInt()) % 1000
         if (x >= 900) {
-            temp += "CM"
-            x -= 900
+            temp += rim[0]
+            x -= des[0]
         }
         if (x >= 500) {
-            x -= 500
-            temp += "D"
+            temp += rim[1]
+            x -= des[1]
         }
         if (x >= 400) {
-            x -= 400
-            temp += "CD"
+            x -= des[2]
+            temp += rim[2]
         }
         temp += hundreds(x)
         if (x >= 100) x %= 100
         if (x >= 90) {
-            temp += "XC"
-            x -= 90
+            temp += rim[3]
+            x -= des[3]
         }
         if (x >= 50) {
-            x -= 50
-            temp += "L"
+            x -= des[4]
+            temp += rim[4]
         }
         if (x >= 40) {
-            x -= 40
-            temp += "XL"
+            x -= des[5]
+            temp += rim[5]
         }
         temp += dozens(x)
         if (x >= 10) x %= 10
         if (x == 9) {
-            temp += "IX"
-            x -= 9
+            temp += rim[6]
+            x -= des[6]
         }
         if (x >= 5) {
-            x -= 5
-            temp += "V"
+            x -= des[7]
+            temp += rim[7]
             temp += units(x)
             x = 0
         }
         if (x == 4) {
-            temp += "IV"
-            x -= 4
+            temp += rim[8]
+            x -= des[8]
         }
         temp += units(x)
     }
@@ -508,51 +469,101 @@ fun roman(n: Int): String {
  * Записать заданное натуральное число 1..999999  прописью по-русски.
  * Например, 375 ="триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
+ *
  */
+val units = listOf(
+    "нулевой",
+    "один",
+    "два",
+    "три",
+    "четыре",
+    "пять",
+    "шесть",
+    "семь",
+    "восемь",
+    "девять"
+)
+val tentonineteen = listOf(
+    "десять",
+    "одиннадцать",
+    "двенадцать",
+    "тринадцать",
+    "четырнадцать",
+    "пятнадцать",
+    "шестнадцать",
+    "семнадцать",
+    "восемнадцать",
+    "девятнадцать"
+)
+val dozens = listOf(
+    "нулевой",
+    "десять",
+    "двадцать",
+    "тридцать",
+    "сорок",
+    "пятьдесят",
+    "шестьдесят",
+    "семьдесят",
+    "восемьдесят",
+    "девяносто"
+)
+val hundreds = listOf(
+    "нулевой",
+    "сто",
+    "двести",
+    "триста",
+    "четыреста",
+    "пятьсот",
+    "шестьсот",
+    "семьсот",
+    "восемьсот",
+    "девятьсот"
+)
+
 fun russian(n: Int): String {
-    var sp: String = ""
+    var sp = ""
     var x = n
     if (x >= 1000) {
         x /= 1000
         if ((x / 100) > 0) {
-            sp += sotni[x / pow10(digitNumber(x) - 1)]
+            sp += hundreds[x / pow10(digitNumber(x) - 1)]
             x %= pow10(digitNumber(x) - 1)
             if (x > 0) sp += " " else sp += " тысяч"
         }
         if ((x / 10) >= 2) {
-            sp += desyatki[x / pow10(digitNumber(x) - 1)]
+            sp += dozens[x / pow10(digitNumber(x) - 1)]
             x %= pow10(digitNumber(x) - 1)
             if (x > 0) sp += " " else sp += " тысяч"
         }
         if ((x / 10) == 1) {
-            sp += desyatdevyatnadcat[x % pow10(digitNumber(x) - 1)]
+            sp += tentonineteen[x % pow10(digitNumber(x) - 1)]
             x /= 100
             sp += " тысяч"
         }
         if (x > 0) {
             if (x == 1) sp += "одна тысяча"
             if (x == 2) sp += "две тысячи"
-            if ((x == 3) || (x % 10 == 4)) sp = sp + edinici[x] + " тысячи"
-            if ((x >= 5) && (x % 10 <= 9)) sp = sp + edinici[x] + " тысяч"
+            if ((x == 3) || (x % 10 == 4)) sp = sp + units[x] + " тысячи"
+            if ((x >= 5) && (x % 10 <= 9)) sp = sp + units[x] + " тысяч"
 
         }
     }
     if ((n % 1000 != 0) && (n > 999)) sp += " "
     x = n % 1000
     if ((x / 100) > 0) {
-        sp += sotni[x / pow10(digitNumber(x) - 1)]
+        sp += hundreds[x / pow10(digitNumber(x) - 1)]
         x %= pow10(digitNumber(x) - 1)
         if (x > 0) sp += " "
     }
     if ((x / 10) >= 2) {
-        sp += desyatki[x / pow10(digitNumber(x) - 1)]
+        sp += dozens[x / pow10(digitNumber(x) - 1)]
         x %= pow10(digitNumber(x) - 1)
         if (x > 0) sp += " "
     }
     if ((x / 10) == 1) {
-        sp += desyatdevyatnadcat[x % pow10(digitNumber(x) - 1)]
+        sp += tentonineteen[x % pow10(digitNumber(x) - 1)]
         x /= 100
     }
-    if (x > 0) sp += edinici[x]
+    if (x > 0) sp += units[x]
     return sp
 }
