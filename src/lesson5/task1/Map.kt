@@ -341,11 +341,11 @@ fun hasAnagrams(words: List<String>): Boolean {
  *        )
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    var count = 0
     val all = mutableMapOf<String, MutableSet<String>>()
     val tempset =
-        mutableSetOf<String>() //создан для того, чтобы на третьем шаг не возникали ошибки, при проходке по сету
-    var allold = mutableMapOf<String, MutableSet<String>>()
+        mutableSetOf<String>() //создан для того, чтобы на третьем шаг не возникали ошибки при проходке по сету
+    var allold = mapOf<String, MutableSet<String>>()
+    var sizebefore = 0
     for ((name, set) in friends) { //шаг 1
         all.putIfAbsent(name, mutableSetOf())
         for (element in set) {
@@ -355,17 +355,17 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     for ((name, set) in friends) { //шаг 2
         all[name]!!.addAll(set)
     }
-    while (count != 2) {// в конце цикла проверяется, изменился ли all, если да, то счетчиу обнуляется, если нет,
-        // то добавляется единица. Если он не изменился дважды, то результат можно выводить
+    while (allold != all) {
         allold = all
         for ((name, set) in all) {// шаг 3
             for (element in set) {
                 if (friends.containsKey(element)) tempset += friends[element]!!
             }
+            sizebefore = all[name]!!.size ?: 0
             all[name]!!.addAll(tempset)
+            if (all[name]!!.size ?: 0 != sizebefore) allold = mapOf()//если изменился размер сета, то опустошаем allold
             tempset.clear()
         }
-        if (allold != all) count = 0 else count++
     }//добавили все рукопожатия (включая лишние)
     for ((name, handshakes) in all) handshakes.removeIf { it == name }//шаг 4
     return all
@@ -389,7 +389,11 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun firstsecondindices(list: List<Int>, first: Int, second: Int): Pair<Int, Int> {//ищет разные индексы для одинаковых элементов
+fun firstsecondindices(
+    list: List<Int>,
+    first: Int,
+    second: Int
+): Pair<Int, Int> {//ищет разные индексы для одинаковых элементов
     var odin = 0
     var dva = 0
     for (i in list.indices) {
