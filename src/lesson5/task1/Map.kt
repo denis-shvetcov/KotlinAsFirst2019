@@ -356,14 +356,15 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
         all[name]!!.addAll(set)
     }
     while (allold != all) {
-        allold = all
+        allold = all//присваиваем значение all до цикла
         for ((name, set) in all) {// шаг 3
             for (element in set) {
                 if (friends.containsKey(element)) tempset += friends[element]!!
             }
             sizebefore = all[name]!!.size ?: 0
             all[name]!!.addAll(tempset)
-            if (all[name]!!.size ?: 0 != sizebefore) allold = mapOf()//если изменился размер сета, то опустошаем allold
+            if (all[name]!!.size ?: 0 != sizebefore) allold = mapOf()//если изменился размер сета,
+            // то есть добавились знакомые, то опустошаем allold
             tempset.clear()
         }
     }//добавили все рукопожатия (включая лишние)
