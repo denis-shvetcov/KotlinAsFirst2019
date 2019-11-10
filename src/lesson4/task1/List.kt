@@ -332,7 +332,7 @@ fun decimalFromString(str: String, base: Int): Int {
     var number = str.reversed()
     while (number.isNotEmpty()) {
         last = number.last()
-        if (last.toInt() >= 'a'.toInt()) sum += (last.toInt() - 'a'.toInt() + 10) * powint(
+        if (last >= 'a') sum += (last - 'a' + 10) * powint(
             base,
             number.length - 1
         ) //код 'a'=97, если отнять от кода последней буквы 87, то получим число >9
@@ -356,110 +356,30 @@ fun decimalFromString(str: String, base: Int): Int {
 
 
 fun roman(n: Int): String {
-    fun tisyachi(n: Int): Int {
-        var number = digitNumber(n)
-        var thousands = 0
-        if (n < 4000) return 0 else {
-            while (number > 0) {
-                thousands += 1
-                number -= 3
-            }
+    var result = ""
+    var input = n
+    val numbers = listOf<Pair<Int, String>>(
+        (1000 to "M"),
+        (900 to "CM"),
+        (500 to "D"),
+        (400 to "CD"),
+        (100 to "C"),
+        (90 to "XC"),
+        (50 to "L"),
+        (40 to "XL"),
+        (10 to "X"),
+        (9 to "IX"),
+        (5 to "V"),
+        (4 to "IV"),
+        (1 to "I")
+    )
+    for (i in numbers.indices) {
+        while (input >= numbers[i].first) {
+            input -= numbers[i].first
+            result += numbers[i].second
         }
-        return thousands - 1
     }
-
-    fun thousands(n: Int): String {
-        var x = n
-        var numbers: String = ""
-        while (x >= 1000) {
-            x -= 1000
-            numbers += "M"
-        }
-        return numbers
-    }
-
-    fun hundreds(n: Int): String {
-        var x = n
-        var numbers: String = ""
-        while (x >= 100) {
-            x -= 100
-            numbers += "C"
-        }
-        return numbers
-    }
-
-    fun dozens(n: Int): String {
-        var x = n
-        var numbers: String = ""
-        while (x >= 10) {
-            x -= 10
-            numbers += "X"
-        }
-        return numbers
-    }
-
-    fun units(n: Int): String {
-        var x = n
-        var numbers: String = ""
-        while (x > 0) {
-            numbers += "I"
-            x -= 1
-        }
-        return numbers
-    }
-
-    val rim = listOf("CM", "D", "CD", "XC", "L", "XL", "IX", "V", "IV")
-    val des = listOf(900, 500, 400, 90, 50, 40, 9, 5, 4)
-    var temp: String = ""
-    var x = n
-    if (n in 1000..3999) temp += thousands(n)
-    for (i in tisyachi(n) downTo 0) {
-        if (n < 4000) x = n % 1000 else x = n / (1000.0.pow(i).toInt()) % 1000
-        if (x >= 900) {
-            temp += rim[0]
-            x -= des[0]
-        }
-        if (x >= 500) {
-            temp += rim[1]
-            x -= des[1]
-        }
-        if (x >= 400) {
-            x -= des[2]
-            temp += rim[2]
-        }
-        temp += hundreds(x)
-        if (x >= 100) x %= 100
-        if (x >= 90) {
-            temp += rim[3]
-            x -= des[3]
-        }
-        if (x >= 50) {
-            x -= des[4]
-            temp += rim[4]
-        }
-        if (x >= 40) {
-            x -= des[5]
-            temp += rim[5]
-        }
-        temp += dozens(x)
-        if (x >= 10) x %= 10
-        if (x == 9) {
-            temp += rim[6]
-            x -= des[6]
-        }
-        if (x >= 5) {
-            x -= des[7]
-            temp += rim[7]
-            temp += units(x)
-            x = 0
-        }
-        if (x == 4) {
-            temp += rim[8]
-            x -= des[8]
-        }
-        temp += units(x)
-    }
-    return temp
+    return result
 }
 
 
