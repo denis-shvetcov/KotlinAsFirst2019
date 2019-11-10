@@ -278,7 +278,7 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  */
 fun hasAnagrams(words: List<String>): Boolean {
     if (words.isEmpty() || words == listOf("")) return false
-    val set = mutableSetOf(mutableMapOf<Char, Int>())
+    val set = mutableSetOf<MutableMap<Char, Int>>()
     for (word in words) {
         val pair = mutableMapOf<Char, Int>()
         for (letter in word) {
@@ -286,7 +286,6 @@ fun hasAnagrams(words: List<String>): Boolean {
         }
         set.add(pair)
     }
-    set.removeIf { it == emptyMap<Char, Int>() }
     return set.size < words.size
 }
 
