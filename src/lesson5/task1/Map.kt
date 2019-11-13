@@ -363,33 +363,6 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun firstsecondindices(
-    list: List<Int>,
-    first: Int,
-    second: Int
-): Pair<Int, Int> {//ищет разные индексы для одинаковых элементов
-    var odin = 0
-    var dva = 0
-    for (i in list.indices) {
-        if (list[i] == first) {
-            odin = i
-            break
-        }
-    }
-    for (i in list.indices) {
-        if (list[i] == second && odin != i) {
-            dva = i
-            break
-        }
-    }
-    return Pair(odin, dva)
-}
-
-fun pairSort(pair: Pair<Int, Int>): Pair<Int, Int> {//сортирует пару по возрастанию
-    val first = pair.first
-    val second = pair.second
-    return if (first < second) Pair(first, second) else Pair(second, first)
-}
 
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val numberindex = mutableMapOf<Int, Int>() //map с парами: число-индекс
@@ -422,4 +395,4 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> =TODO()
