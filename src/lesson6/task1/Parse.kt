@@ -90,7 +90,7 @@ fun dateStrToDigit(str: String): String {
     )
 
     val date = str.split(" ")
-    if (date.joinToString() == str || date[0].toInt() > 31) return ""
+    if (date.joinToString() == str || date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)) return ""
     var month = ""
     if (date[1] in months) {
         if (date[0].toInt() == 29 && months.indexOf(date[1]) == 2 &&
@@ -135,6 +135,7 @@ fun dateDigitToStr(digital: String): String {
     val year = date[2].toIntOrNull()
     if (month in 1..12 && day ?: 0 < 32 && day != null && month != null && year != null) correctmonth =
         months[month] else return ""
+    if (month == 2 && day > 29) return ""
     if (day == 29 && month == 2 && daysInMonth(month, year) != day || date.size != 3) return ""
     return "$day $correctmonth $year"
 }
@@ -220,7 +221,7 @@ fun bestHighJump(jumps: String): Int {
  */
 fun plusMinus(expression: String): Int {
     val list = expression.split(" ")
-    if (Regex("""[\d]""").replace(list[0], "") != "") throw IllegalArgumentException()
+    if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty()) throw IllegalArgumentException()
     var sum = list[0].toInt()
     for (i in 1 until list.size - 1 step 2) {
         if ((list[i] != "-" && list[i] != "+") || Regex("""[\d]""").replace(list[i + 1], "") != "")
@@ -244,8 +245,8 @@ fun firstDuplicateIndex(str: String): Int {
     var word = ""
     for (i in newstr.indices) {
         if (str[i] == ' ') {//отслеживаем пробел
-            if (Regex("""($word(?=\s$word))""").find(newstr) != null)
-                return Regex("""($word(?=\s$word))""").find(newstr)!!.range.first else word = ""
+            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null)
+                return Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr)!!.range.first else word = ""
         } else word += newstr[i]//создает слово
     }
     return -1
@@ -265,7 +266,7 @@ fun firstDuplicateIndex(str: String): Int {
 fun mostExpensive(description: String): String {
     if (description.isEmpty()) return ""
     val list = description.split("; ")
-    var max = 0.0
+    var max = Double.NEGATIVE_INFINITY
     var namemax = ""
     for (i in list.indices) {
         if (Regex("""(\d+)""").find(list[i])!!.value.toDouble() > max) {
@@ -305,7 +306,7 @@ fun fromRoman(roman: String): Int {
         (5 to "V"),
         (1 to "I")
     )
-    if (Regex("""[IVXLCDM]""").replace(roman, "") != "") return -1
+    if ((Regex("""[IVXLCDM]""").replace(roman, "") != "") || roman.isEmpty()) return -1
     for (i in numbers.indices) {
         val second = numbers[i].second
         if (newroman.contains(Regex("""($second+)"""))) {
@@ -352,7 +353,6 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-
 
 
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
