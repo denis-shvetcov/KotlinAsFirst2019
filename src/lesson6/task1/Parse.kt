@@ -355,7 +355,4 @@ fun fromRoman(roman: String): Int {
 
 
 
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-
-}
-
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
