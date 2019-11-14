@@ -88,12 +88,10 @@ fun dateStrToDigit(str: String): String {
         "ноября",
         "декабря"
     )
-
     val date = str.split(" ")
     if (date.joinToString() == str || date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)
-        || (date[0].toInt() == 31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt()))
-    )
-        return ""
+        || (date[0].toInt() == 31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt())) ||
+        date.size < 3) return ""
     var month = ""
     if (date[1] in months) {
         if (date[0].toInt() == 29 && months.indexOf(date[1]) == 2 &&
@@ -226,7 +224,8 @@ fun bestHighJump(jumps: String): Int {
 fun plusMinus(expression: String): Int {
     val list = expression.split(" ")
     if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty() ||
-        Regex("""[\s]""").replace(expression, "") == "") throw IllegalArgumentException()
+        Regex("""[\s]""").replace(expression, "") == ""
+    ) throw IllegalArgumentException()
     var sum = list[0].toInt()
     for (i in 1 until list.size - 1 step 2) {
         if ((list[i] != "-" && list[i] != "+") || Regex("""[\d]""").replace(list[i + 1], "") != "")
@@ -251,7 +250,7 @@ fun firstDuplicateIndex(str: String): Int {
     var word = ""
     for (i in newstr.indices) {
         if (str[i] == ' ') {//отслеживаем пробел
-            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null && word.toIntOrNull() == null)
+            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null )
                 setofindices += Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr)!!.range.first else word = ""
         } else word += newstr[i]//создает слово
     }
