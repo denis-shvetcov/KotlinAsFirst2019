@@ -90,12 +90,16 @@ fun dateStrToDigit(str: String): String {
     )
 
     val date = str.split(" ")
-    if (date.joinToString() == str || date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)) return ""
+    if (date.joinToString() == str || date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)
+        || (date[0].toInt() in 30..31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt()))
+    )
+        return ""
     var month = ""
     if (date[1] in months) {
         if (date[0].toInt() == 29 && months.indexOf(date[1]) == 2 &&
             daysInMonth(months.indexOf(date[1]), date[2].toInt()) != date[0].toInt()
-        ) return "" else month = twoDigitStr(months.indexOf(date[1]))
+        )
+            return "" else month = twoDigitStr(months.indexOf(date[1]))
     } else return ""
     val day = twoDigitStr(date[0].toInt())
     val year = date[2].toInt()
@@ -135,7 +139,7 @@ fun dateDigitToStr(digital: String): String {
     val year = date[2].toIntOrNull()
     if (month in 1..12 && day ?: 0 < 32 && day != null && month != null && year != null) correctmonth =
         months[month] else return ""
-    if (month == 2 && day > 29) return ""
+    if ((month == 2 && day > 29) || (day in 30..31 && day != daysInMonth(month, year))) return ""
     if (day == 29 && month == 2 && daysInMonth(month, year) != day || date.size != 3) return ""
     return "$day $correctmonth $year"
 }
@@ -245,7 +249,7 @@ fun firstDuplicateIndex(str: String): Int {
     var word = ""
     for (i in newstr.indices) {
         if (str[i] == ' ') {//отслеживаем пробел
-            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null)
+            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null && word.toIntOrNull() == null)
                 return Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr)!!.range.first else word = ""
         } else word += newstr[i]//создает слово
     }
@@ -269,9 +273,9 @@ fun mostExpensive(description: String): String {
     var max = Double.NEGATIVE_INFINITY
     var namemax = ""
     for (i in list.indices) {
-        if (Regex("""(\d+)""").find(list[i])!!.value.toDouble() > max) {
-            max = Regex("""(\d+)""").find(list[i])!!.value.toDouble()
-            namemax = Regex("""[\d\s.]""").replace(list[i], "")
+        if (Regex("""(\s\d+)""").find(list[i])!!.value.toDouble() > max) {
+            max = Regex("""(\s\d+)""").find(list[i])!!.value.toDouble()
+            namemax = Regex("""(\s.*)""").replace(list[i], "")
         }
     }
     return namemax
