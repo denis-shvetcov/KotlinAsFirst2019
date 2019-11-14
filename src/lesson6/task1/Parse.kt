@@ -91,7 +91,7 @@ fun dateStrToDigit(str: String): String {
 
     val date = str.split(" ")
     if (date.joinToString() == str || date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)
-        || (date[0].toInt() in 30..31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt()))
+        || (date[0].toInt() == 31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt()))
     )
         return ""
     var month = ""
@@ -139,7 +139,7 @@ fun dateDigitToStr(digital: String): String {
     val year = date[2].toIntOrNull()
     if (month in 1..12 && day ?: 0 < 32 && day != null && month != null && year != null) correctmonth =
         months[month] else return ""
-    if ((month == 2 && day > 29) || (day in 30..31 && day != daysInMonth(month, year))) return ""
+    if ((month == 2 && day > 29) || (day == 31 && day != daysInMonth(month, year))) return ""
     if (day == 29 && month == 2 && daysInMonth(month, year) != day || date.size != 3) return ""
     return "$day $correctmonth $year"
 }
@@ -225,7 +225,8 @@ fun bestHighJump(jumps: String): Int {
  */
 fun plusMinus(expression: String): Int {
     val list = expression.split(" ")
-    if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty()) throw IllegalArgumentException()
+    if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty() ||
+        Regex("""[\s]""").replace(expression, "") == "") throw IllegalArgumentException()
     var sum = list[0].toInt()
     for (i in 1 until list.size - 1 step 2) {
         if ((list[i] != "-" && list[i] != "+") || Regex("""[\d]""").replace(list[i + 1], "") != "")
@@ -245,15 +246,16 @@ fun plusMinus(expression: String): Int {
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
+    val setofindices = mutableSetOf<Int>()// индексы совпадений
     val newstr = str.map { it.toLowerCase() }.joinToString(separator = "")
     var word = ""
     for (i in newstr.indices) {
         if (str[i] == ' ') {//отслеживаем пробел
             if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null && word.toIntOrNull() == null)
-                return Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr)!!.range.first else word = ""
+                setofindices += Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr)!!.range.first else word = ""
         } else word += newstr[i]//создает слово
     }
-    return -1
+    return if (setofindices.isNotEmpty()) setofindices.sorted().first() else -1
 }
 
 /**
