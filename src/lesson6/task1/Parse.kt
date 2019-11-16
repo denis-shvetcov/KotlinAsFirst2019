@@ -91,7 +91,8 @@ fun dateStrToDigit(str: String): String {
     val date = str.split(" ")
     if (date.joinToString() == str || date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)
         || (date[0].toInt() == 31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt())) ||
-        date.size < 3) return ""
+        date.size < 3 || date.contains("")
+    ) return ""
     var month = ""
     if (date[1] in months) {
         if (date[0].toInt() == 29 && months.indexOf(date[1]) == 2 &&
@@ -131,6 +132,7 @@ fun dateDigitToStr(digital: String): String {
         "декабря"
     )
     var correctmonth = ""
+    if (Regex("""[\.\d]""").find(digital) == null) return ""
     val date = digital.split(".")
     val day = date[0].toIntOrNull()
     val month = date[1].toIntOrNull()
@@ -225,6 +227,7 @@ fun plusMinus(expression: String): Int {
     val list = expression.split(" ")
     if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty() ||
         Regex("""[\s]""").replace(expression, "") == ""
+        || list.contains("")
     ) throw IllegalArgumentException()
     var sum = list[0].toInt()
     for (i in 1 until list.size - 1 step 2) {
@@ -250,7 +253,7 @@ fun firstDuplicateIndex(str: String): Int {
     var word = ""
     for (i in newstr.indices) {
         if (str[i] == ' ') {//отслеживаем пробел
-            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null )
+            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null)
                 setofindices += Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr)!!.range.first else word = ""
         } else word += newstr[i]//создает слово
     }
@@ -274,8 +277,10 @@ fun mostExpensive(description: String): String {
     var max = Double.NEGATIVE_INFINITY
     var namemax = ""
     for (i in list.indices) {
-        if (Regex("""(\s\d+)""").find(list[i])!!.value.toDouble() > max) {
-            max = Regex("""(\s\d+)""").find(list[i])!!.value.toDouble()
+        if (Regex("""(\s\d+)""").find(list[i])!!.value.toDouble() > max || (Regex("""(\s\d+\.\d+)""").find(list[i])!!.value.toDouble() > max)) {
+            if (Regex("""(\s\d+\.\d+)""").find(list[i]) != null) max =
+                Regex("""(\s\d+\.\d+)""").find(list[i])!!.value.toDouble() else max =
+                Regex("""(\s\d+)""").find(list[i])!!.value.toDouble()
             namemax = Regex("""(\s.*)""").replace(list[i], "")
         }
     }
