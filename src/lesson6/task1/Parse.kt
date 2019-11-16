@@ -88,10 +88,10 @@ fun dateStrToDigit(str: String): String {
         "ноября",
         "декабря"
     )
+    if (Regex("""(\d+\s.+\s\d+)""").find(str) == null) return ""
     val date = str.split(" ")
-    if (date.joinToString() == str || date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)
-        || (date[0].toInt() == 31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt())) ||
-        date.size < 3 || date.contains("")
+    if (date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29)
+        || (date[0].toInt() == 31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt()))
     ) return ""
     var month = ""
     if (date[1] in months) {
@@ -132,7 +132,7 @@ fun dateDigitToStr(digital: String): String {
         "декабря"
     )
     var correctmonth = ""
-    if (Regex("""[\.\d]""").find(digital) == null) return ""
+    if (Regex("""(\d\d\.\d\d\.\d+)""").find(digital) == null) return ""
     val date = digital.split(".")
     val day = date[0].toIntOrNull()
     val month = date[1].toIntOrNull()
@@ -225,9 +225,8 @@ fun bestHighJump(jumps: String): Int {
  */
 fun plusMinus(expression: String): Int {
     val list = expression.split(" ")
-    if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty() ||
-        Regex("""[\s]""").replace(expression, "") == ""
-        || list.contains("")
+    if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty()
+        || list.contains("") || Regex("""[\d\s\+\-]""").replace(expression,"")!=""
     ) throw IllegalArgumentException()
     var sum = list[0].toInt()
     for (i in 1 until list.size - 1 step 2) {
@@ -277,7 +276,7 @@ fun mostExpensive(description: String): String {
     var max = Double.NEGATIVE_INFINITY
     var namemax = ""
     for (i in list.indices) {
-        if (Regex("""(\s\d+)""").find(list[i])!!.value.toDouble() > max || (Regex("""(\s\d+\.\d+)""").find(list[i])!!.value.toDouble() > max)) {
+        if (Regex("""(\s\d+)""").find(list[i])!!.value.toDouble() >= max || (Regex("""(\s\d+\.\d+)""").find(list[i])!!.value.toDouble() >= max)) {
             if (Regex("""(\s\d+\.\d+)""").find(list[i]) != null) max =
                 Regex("""(\s\d+\.\d+)""").find(list[i])!!.value.toDouble() else max =
                 Regex("""(\s\d+)""").find(list[i])!!.value.toDouble()
