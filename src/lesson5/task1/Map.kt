@@ -174,8 +174,12 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
         all[name] = mutableListOf(number)
     }
     for ((name, number) in mapB) {
-        if (!all.containsKey(name)) all[name] = mutableListOf(number) else {
-            if (!all[name]!!.contains(number)) all[name]!!.add(number)
+        if (!all.containsKey(name)) {
+            all[name] = mutableListOf(number)
+        } else {
+            if (all[name]?.contains(number) == false) {
+                all[name]?.add(number)
+            }
         }
     }
     for ((name, list) in all) {
@@ -197,7 +201,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
     val averagelist = mutableMapOf<String, List<Double>>()
     val newaveragelist = mutableMapOf<String, Double>()
-    for (pair in stockPrices) averagelist[pair.first] = averagelist.getOrDefault(pair.first, listOf()) + pair.second
+    for ((name, price) in stockPrices) averagelist[name] = averagelist.getOrDefault(name, listOf()) + price
     for ((name, sum) in averagelist) newaveragelist[name] = sum.sum() / sum.size
     return newaveragelist
 }
@@ -317,8 +321,8 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     val all = mutableMapOf<String, MutableSet<String>>()
     val tempset =
         mutableSetOf<String>() //создан для того, чтобы на третьем шаг не возникали ошибки при проходке по сету
-    var allold = mapOf<String, MutableSet<String>>()
-    var sizebefore = 0
+    var allOld = mapOf<String, MutableSet<String>>()
+    var sizeBefore = 0
     for ((name, set) in friends) { //шаг 1
         all.putIfAbsent(name, mutableSetOf())
         for (element in set) {
@@ -328,15 +332,15 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     for ((name, set) in friends) { //шаг 2
         all[name]!!.addAll(set)
     }
-    while (allold != all) {
-        allold = all//присваиваем значение all до цикла
+    while (allOld != all) {
+        allOld = all//присваиваем значение all до цикла
         for ((name, set) in all) {// шаг 3
             for (element in set) {
                 if (friends.containsKey(element)) tempset += friends[element]!!
             }
-            sizebefore = all[name]!!.size ?: 0
+            sizeBefore = all[name]!!.size ?: 0
             all[name]!!.addAll(tempset)
-            if (all[name]!!.size ?: 0 != sizebefore) allold = mapOf()//если изменился размер сета,
+            if (all[name]!!.size ?: 0 != sizeBefore) allOld = mapOf()//если изменился размер сета,
             // то есть добавились знакомые, то опустошаем allold
             tempset.clear()
         }
@@ -365,9 +369,9 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  */
 
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val numberindex = mutableMapOf<Int, Int>() //map с парами: число-индекс
+    val numberIndex = mutableMapOf<Int, Int>() //map с парами: число-индекс
     for (i in list.indices) {
-        if (numberindex.containsKey(number - list[i])) return (numberindex[number - list[i]]!! to i) else numberindex[list[i]] =
+        if (numberIndex.containsKey(number - list[i])) return (numberIndex[number - list[i]]!! to i) else numberIndex[list[i]] =
             i
     }
     return (-1 to -1)
@@ -395,4 +399,4 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> =TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()

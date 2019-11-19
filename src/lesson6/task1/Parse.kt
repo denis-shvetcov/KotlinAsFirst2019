@@ -4,7 +4,23 @@ package lesson6.task1
 
 import lesson2.task2.daysInMonth
 import java.lang.Exception
+val months = listOf(
+    "нулевой",
+    "января",
+    "февраля",
+    "марта",
+    "апреля",
+    "мая",
+    "июня",
+    "июля",
+    "августа",
+    "сентября",
+    "октября",
+    "ноября",
+    "декабря"
+)
 
+val findDigital = """[\d]""".toRegex()
 /**
  * Пример
  *
@@ -73,38 +89,23 @@ fun main() {
  * входными данными.
  */
 fun dateStrToDigit(str: String): String {
-    val months = listOf<String>(
-        "нулевой",
-        "января",
-        "февраля",
-        "марта",
-        "апреля",
-        "мая",
-        "июня",
-        "июля",
-        "августа",
-        "сентября",
-        "октября",
-        "ноября",
-        "декабря"
-    )
-    if (Regex("""(\d+\s.+\s\d+)""").find(str) == null) return ""
+    if (Regex("""((?<!.)\d+\s.+\s\d+)""").find(str) == null) return ""
     val date = str.split(" ")
-    if (Regex("""[\d]""").replace(date[0], "") != "" ||
-        Regex("""[\d]""").replace(date[2], "") != "" ||
-        date[0].toInt() > 31 || (date[1] == months[2] && date[0].toInt() > 29) ||
-        (date[0].toInt() == 31 && date[0].toInt() != daysInMonth(months.indexOf(date[1]), date[2].toInt()))
-    ) return ""
-    var month = ""
-    if (date[1] in months) {
-        if (date[0].toInt() == 29 && months.indexOf(date[1]) == 2 &&
-            daysInMonth(months.indexOf(date[1]), date[2].toInt()) != date[0].toInt()
-        )
-            return "" else month = twoDigitStr(months.indexOf(date[1]))
-    } else return ""
-    val day = twoDigitStr(date[0].toInt())
+    val day = date[0].toInt()
+    var month = date[1]
     val year = date[2].toInt()
-    return "$day.$month.$year"
+    if (findDigital.replace(day.toString(), "") != "" ||
+        findDigital.replace(year.toString(), "") != "" ||
+        day > 31 || (month == months[2] && day > 29) ||
+        (day == 31 && day != daysInMonth(months.indexOf(month), year))
+    ) return ""
+    if (month in months) {
+        if (day == 29 && months.indexOf(month) == 2 &&
+            daysInMonth(months.indexOf(month), year) != day
+        )
+            return "" else month = twoDigitStr(months.indexOf(month))
+    } else return ""
+    return "${twoDigitStr(day)}.$month.$year"
 }
 
 /**
@@ -118,21 +119,6 @@ fun dateStrToDigit(str: String): String {
  * входными данными.
  */
 fun dateDigitToStr(digital: String): String {
-    val months = listOf<String>(
-        "нулевой",
-        "января",
-        "февраля",
-        "марта",
-        "апреля",
-        "мая",
-        "июня",
-        "июля",
-        "августа",
-        "сентября",
-        "октября",
-        "ноября",
-        "декабря"
-    )
     var correctmonth = ""
     if (Regex("""(\d\d\.\d\d\.\d+)""").find(digital) == null) return ""
     val date = digital.split(".")
@@ -229,12 +215,12 @@ fun bestHighJump(jumps: String): Int {
  */
 fun plusMinus(expression: String): Int {
     val list = expression.split(" ")
-    if (Regex("""[\d]""").replace(list[0], "") != "" || expression.isEmpty()
+    if (findDigital.replace(list[0], "") != "" || expression.isEmpty()
         || list.contains("") || Regex("""[\d\s\+\-]""").replace(expression, "") != ""
     ) throw IllegalArgumentException()
     var sum = list[0].toInt()
     for (i in 1 until list.size - 1 step 2) {
-        if ((list[i] != "-" && list[i] != "+") || Regex("""[\d]""").replace(list[i + 1], "") != "")
+        if ((list[i] != "-" && list[i] != "+") || findDigital.replace(list[i + 1], "") != "")
             throw IllegalArgumentException()
         if (list[i] == "+") sum += list[i + 1].toInt() else sum -= list[i + 1].toInt()
     }
@@ -251,16 +237,17 @@ fun plusMinus(expression: String): Int {
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
-    val setofindices = mutableSetOf<Int>()// индексы совпадений
-    val newstr = str.map { it.toLowerCase() }.joinToString(separator = "")
+    val setofIndices = mutableSetOf<Int>()// индексы совпадений
+    val newStr = str.map { it.toLowerCase() }.joinToString(separator = "")
     var word = ""
-    for (i in newstr.indices) {
+    for (i in newStr.indices) {
+        val twoWordsRegex= """(\Q$word\E(?=\s\Q$word\E))""".toRegex()
         if (str[i] == ' ') {//отслеживаем пробел
-            if (Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr) != null)
-                setofindices += Regex("""(\Q$word\E(?=\s\Q$word\E))""").find(newstr)!!.range.first else word = ""
-        } else word += newstr[i]//создает слово
+            if (twoWordsRegex.find(newStr) != null)
+                setofIndices += twoWordsRegex.find(newStr)!!.range.first else word = ""
+        } else word += newStr[i]//создает слово
     }
-    return if (setofindices.isNotEmpty()) setofindices.sorted().first() else -1
+    return if (setofIndices.isNotEmpty()) setofIndices.sorted().first() else -1
 }
 
 /**
@@ -279,13 +266,15 @@ fun mostExpensive(description: String): String {
     val list = description.split("; ")
     var max = Double.NEGATIVE_INFINITY
     var namemax = ""
+    val findDotPrice = """(\s\d+\.\d+)""".toRegex()
+    val findPrice = """(\s\d+)""".toRegex()
     for (i in list.indices) {
-        if (Regex("""(\s\d+\.\d+)""").find(list[i]) != null && Regex("""(\s\d+\.\d+)""").find(list[i])!!.value.toDouble() >= max) {
-            max = Regex("""(\s\d+\.\d+)""").find(list[i])!!.value.toDouble()
+        if (findDotPrice.find(list[i]) != null && findDotPrice.find(list[i])!!.value.toDouble() >= max) {
+            max = findDotPrice.find(list[i])!!.value.toDouble()
             namemax = Regex("""(\s.*)""").replace(list[i], "")
         }
-        if (Regex("""(\s\d+)""").find(list[i]) != null && Regex("""(\s\d+)""").find(list[i])!!.value.toDouble() >= max) {
-            max = Regex("""(\s\d+)""").find(list[i])!!.value.toDouble()
+        if (findPrice.find(list[i]) != null && findPrice.find(list[i])!!.value.toDouble() >= max) {
+            max = findPrice.find(list[i])!!.value.toDouble()
             namemax = Regex("""(\s.*)""").replace(list[i], "")
         }
     }
@@ -307,7 +296,7 @@ fun mostExpensive(description: String): String {
 fun fromRoman(roman: String): Int {
     var newroman = roman
     var sum = 0
-    val numbers = listOf<Pair<Int, String>>(
+    val numbers = mapOf(
         (900 to "CM"),
         (1000 to "M"),
         (400 to "CD"),
@@ -322,12 +311,14 @@ fun fromRoman(roman: String): Int {
         (5 to "V"),
         (1 to "I")
     )
+
     if ((Regex("""[IVXLCDM]""").replace(roman, "") != "") || roman.isEmpty()) return -1
-    for (i in numbers.indices) {
-        val second = numbers[i].second
-        if (newroman.contains(Regex("""($second+)"""))) {
-            sum += numbers[i].first * Regex("""($second+)""").find(newroman)!!.value.length / second.length
-            newroman = Regex("""($second+)""").replaceFirst(newroman, "")
+    for ((decimalNumber,romanNumber) in numbers) {
+        val second = romanNumber
+        val romanregex= "($second+)".toRegex()
+        if (newroman.contains(romanregex)) {
+            sum += decimalNumber * romanregex.find(newroman)!!.value.length / second.length
+            newroman = romanregex.replaceFirst(newroman, "")
         }
     }
     return sum
