@@ -143,12 +143,12 @@ fun centerFile(inputName: String, outputName: String) {
     var maxlength = 0
     var newline = ""
     for (line in File(inputName).readLines()) {
-        if (line.length > maxlength) maxlength = line.length
+        if (line.trim().trimIndent().length > maxlength) maxlength = line.trim().trimIndent().length
     }
     for (line in File(inputName).readLines()) {
         newline = ""
-        newline += " ".repeat((maxlength - line.length) / 2)
-        newline += line
+        newline += " ".repeat((maxlength - line.trim().length) / 2 - (line.trim().length - line.trim().trimIndent().length))
+        newline += line.trim().trimIndent()
         newText.write(newline)
         newText.newLine()
     }
@@ -187,7 +187,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     var maxlength = 0
     var newLine = ""
     var wordList = mutableListOf<String>()
-    val findSpace = Regex("""[\s]""")
+    val findSpace = Regex("""(\s+)""")
     for (line in File(inputName).readLines()) {
         if (findSpace.replace(line, " ").length > maxlength) {
             maxlength = findSpace.replace(line.trim(), " ").length //самая длинная строка
@@ -197,7 +197,6 @@ fun alignFileByWidth(inputName: String, outputName: String) {
         if (findSpace.replace(line, "") == "") newText.newLine() else { //проверка пустой строки
             if (findSpace.find(line.trim()) == null) newText.write(line.trim()) else { //проверка, что в строке одно слово
                 newLine = findSpace.replace(line.trim(), " ")
-                val startLength = newLine.length //начальная длина строки с одним пробелом м-ду словами
                 wordList = newLine.split(" ").toMutableList()
                 for (i in 0 until maxlength * maxlength) {
                     if (newLine.length != maxlength) {
