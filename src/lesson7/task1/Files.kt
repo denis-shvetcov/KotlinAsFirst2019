@@ -161,8 +161,7 @@ fun centerFile(inputName: String, outputName: String) {
             newText.newLine()
         }
         newText.close()
-    }
-    finally {
+    } finally {
         newText.close()
     }
 }
@@ -621,7 +620,7 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
             "+" + " ".repeat(stringResult.length - digitNumber(localMultiplication) - i) +
                     localMultiplication + "\n"
         ) else
-            result.write(" ".repeat(digitNumber(rhv)) + localMultiplication + "\n")
+            result.write(" ".repeat(stringResult.length + 1 - digitNumber(localMultiplication)) + localMultiplication + "\n")
         newRhv /= 10
     }
     result.write("-".repeat(stringResult.length + 1) + "\n")
@@ -651,28 +650,60 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    /*val result = File(outputName).bufferedWriter()
-    var line = ""
-    var newLhv = lhv
-    var countSpace = 0
-    var vichitaemoe = 0
-    var countnumbers = 0
-    result.write(" $lhv | $rhv\n")
-    val spaces = 1 + digitNumber(lhv) + 3
-    if (countnumbers == 0) {
-        while ((newLhv / pow10(digitNumber(newLhv) - countnumbers)) / rhv == 0) {
-            countnumbers++
+    val result = File(outputName).bufferedWriter()
+    var index = 0
+    var divinded = 0
+    var localQuotient  = 0
+    var divisionCounter = 0 //нужен для частного случая первого деления
+    var nextDigit = 0
+    var underDottedResult = 0
+    var subtrahendLine = ""
+    var dottedLine = ""
+    var underDottedLine = ""
+    result.write(" " + lhv + " | " + rhv)
+    //поиск индекса первого возможного делимого
+    if (lhv > rhv) {
+        for (i in 0..digitNumber(lhv)) {
+            if ((lhv.toString().substring(0..i).toInt()) / rhv != 0) {
+                index = i
+                break
+            }
         }
-        vichitaemoe = (newLhv.toString().reversed().toInt()) % pow10(countnumbers).toString().reversed().toInt() / rhv
-        countSpace += digitNumber(vichitaemoe)
-        if (newLhv == lhv) result.write(
-            " ".repeat(digitNumber(lhv) - digitNumber(newLhv)) + "-" + vichitaemoe + " ".repeat(
-                digitNumber(lhv) - digitNumber(vichitaemoe) + 3
-            ) + "\n"
-        ) else
-            result.write("-" + vichitaemoe + "\n")
     }
-    result.close()*/
+    while (index != digitNumber(lhv)) {
+        divisionCounter++ //увеличиваем счетчик делений
+        //поиск делимого
+        if (divisionCounter == 1) divinded = lhv.toString().substring(0..index).toInt() else divinded = underDottedResult
+        localQuotient = (divinded / rhv) * rhv
+        //определение разряда, следующего за делимым, если последнее деление, то разряд = 123, то есть не существует
+        if (index >= digitNumber(lhv) - 1) nextDigit = 123 else nextDigit =
+            (lhv.toString()).get(index + 1).toString().toInt()
+        //определение результата под пунктирной линией, если последнее деление, то не нужно умножать на 10
+        if (index >= digitNumber(lhv) - 1) underDottedResult = (divinded - localQuotient) else underDottedResult =
+            (divinded - localQuotient) * 10 + nextDigit
+        result.newLine()
+        subtrahendLine = "-$localQuotient"
+        // цикл обрабатывает три строки: вычитаемое, пунктирная, результат вычитания, если третья строка пустая, то мы не добавляем пробелы
+        if (underDottedLine.isNotEmpty()) subtrahendLine =
+            (subtrahendLine.reversed() + (" ").repeat(underDottedLine.length - subtrahendLine.length)).reversed()
+        //создается пунктирная строка и к ней добавляются пробелы
+        dottedLine = "-".repeat(Regex("""[\s]""").replace(subtrahendLine, "").length)
+        dottedLine = (dottedLine.reversed() + " ".repeat(subtrahendLine.length - dottedLine.length)).reversed()
+        //создается строка результата вычитания, в частных случаях нужно прописывать незначащий ноль
+        // также в последней строке исключается случай записи двух нулей
+        if (divinded - localQuotient == 0 && nextDigit != 123) underDottedLine = "0$underDottedResult" else underDottedLine = "$underDottedResult"
+        underDottedLine = (underDottedLine.reversed() + (" ").repeat(subtrahendLine.length - underDottedLine.length + 1)).reversed()
+        //в последней строке пробелы не добавляются, поэтому нужно удалить лишний пробел, чтобы выровнять по правому краю
+        if (index >= digitNumber(lhv) - 1) underDottedLine = underDottedLine.removeRange(0..0)
+        //если делим первый раз, то второй строке нужно добавить результат частного
+        if (divisionCounter == 1) {
+            result.write(subtrahendLine + " ".repeat(4 + digitNumber(lhv) - subtrahendLine.length) + lhv / rhv + "\n")
+        } else result.write(subtrahendLine + "\n")
+        result.write(dottedLine + "\n")
+        result.write(underDottedLine)
+        index++
+    }
+    result.close()
 }
 
 

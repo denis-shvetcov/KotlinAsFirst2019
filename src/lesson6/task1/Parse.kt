@@ -149,10 +149,10 @@ fun dateDigitToStr(digital: String): String {
  */
 fun flattenPhoneNumber(phone: String): String {
     if (Regex("""[\+\-\s\d \( \)]""").replace(phone, "") != "" ||
-        Regex("""(\(\))""").find(phone) != null || (Regex("""[)(]""").find(phone) != null && Regex("""(\(.*\))""").find(
-            phone
-        ) == null)
-    ) return "" // проверка наличия лишних символов и пустых скобок
+        Regex("""(\(\))""").find(phone) != null || (Regex("""[)(]""").find(phone) != null &&
+                Regex("""(\(.*\))""").find(phone) == null) ||
+        (Regex("""[\+\-\s]""").find(phone)!=null && Regex("""[\d]""").find(phone)==null
+    )) return "" // проверка наличия лишних символов и пустых скобок
     return Regex("""[-\s()]""").replace(phone, "")
 }
 
