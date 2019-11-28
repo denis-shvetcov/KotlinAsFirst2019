@@ -336,11 +336,12 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
         allOld = all//присваиваем значение all до цикла
         for ((name, set) in all) {// шаг 3
             for (element in set) {
-                if (friends.containsKey(element)) tempset += friends[element]!!
+                val elementFromFriends = friends[element]
+                if (elementFromFriends != null) tempset += elementFromFriends
             }
-            sizeBefore = all[name]!!.size ?: 0
-            all[name]!!.addAll(tempset)
-            if (all[name]!!.size ?: 0 != sizeBefore) allOld = mapOf()//если изменился размер сета,
+            sizeBefore = set.size
+            set.addAll(tempset)
+            if (set.size != sizeBefore) allOld = mapOf()//если изменился размер сета,
             // то есть добавились знакомые, то опустошаем allold
             tempset.clear()
         }
@@ -371,8 +372,9 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val numberIndex = mutableMapOf<Int, Int>() //map с парами: число-индекс
     for (i in list.indices) {
-        if (numberIndex.containsKey(number - list[i])) return (numberIndex[number - list[i]]!! to i) else numberIndex[list[i]] =
-            i
+        val indexFromNumberIndex = numberIndex[number - list[i]]
+        if (indexFromNumberIndex != null) return (indexFromNumberIndex to i)
+        else numberIndex[list[i]] = i
     }
     return (-1 to -1)
 }

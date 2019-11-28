@@ -4,6 +4,7 @@ package lesson6.task1
 
 import lesson2.task2.daysInMonth
 import java.lang.Exception
+
 val months = listOf(
     "нулевой",
     "января",
@@ -241,7 +242,7 @@ fun firstDuplicateIndex(str: String): Int {
     val newStr = str.map { it.toLowerCase() }.joinToString(separator = "")
     var word = ""
     for (i in newStr.indices) {
-        val twoWordsRegex= """(\Q$word\E(?=\s\Q$word\E))""".toRegex()
+        val twoWordsRegex = """(\Q$word\E(?=\s\Q$word\E))""".toRegex()
         if (str[i] == ' ') {//отслеживаем пробел
             if (twoWordsRegex.find(newStr) != null)
                 setofIndices += twoWordsRegex.find(newStr)!!.range.first else word = ""
@@ -269,12 +270,14 @@ fun mostExpensive(description: String): String {
     val findDotPrice = """(\s\d+\.\d+)""".toRegex()
     val findPrice = """(\s\d+)""".toRegex()
     for (i in list.indices) {
-        if (findDotPrice.find(list[i]) != null && findDotPrice.find(list[i])!!.value.toDouble() >= max) {
-            max = findDotPrice.find(list[i])!!.value.toDouble()
+        val resultFindDotPrice = findDotPrice.find(list[i])
+        if (resultFindDotPrice != null && resultFindDotPrice.value.toDouble() >= max) {
+            max = resultFindDotPrice.value.toDouble()
             namemax = Regex("""(\s.*)""").replace(list[i], "")
         }
-        if (findPrice.find(list[i]) != null && findPrice.find(list[i])!!.value.toDouble() >= max) {
-            max = findPrice.find(list[i])!!.value.toDouble()
+        val resultFindPrice = findPrice.find(list[i])
+        if (resultFindPrice != null && resultFindPrice.value.toDouble() >= max) {
+            max = resultFindPrice.value.toDouble()
             namemax = Regex("""(\s.*)""").replace(list[i], "")
         }
     }
@@ -293,31 +296,31 @@ fun mostExpensive(description: String): String {
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
+val numbers = mapOf(
+    (900 to "CM"),
+    (1000 to "M"),
+    (400 to "CD"),
+    (500 to "D"),
+    (90 to "XC"),
+    (100 to "C"),
+    (40 to "XL"),
+    (50 to "L"),
+    (9 to "IX"),
+    (10 to "X"),
+    (4 to "IV"),
+    (5 to "V"),
+    (1 to "I")
+)
+
 fun fromRoman(roman: String): Int {
     var newroman = roman
     var sum = 0
-    val numbers = mapOf(
-        (900 to "CM"),
-        (1000 to "M"),
-        (400 to "CD"),
-        (500 to "D"),
-        (90 to "XC"),
-        (100 to "C"),
-        (40 to "XL"),
-        (50 to "L"),
-        (9 to "IX"),
-        (10 to "X"),
-        (4 to "IV"),
-        (5 to "V"),
-        (1 to "I")
-    )
-
     if ((Regex("""[IVXLCDM]""").replace(roman, "") != "") || roman.isEmpty()) return -1
-    for ((decimalNumber,romanNumber) in numbers) {
-        val second = romanNumber
-        val romanregex= "($second+)".toRegex()
-        if (newroman.contains(romanregex)) {
-            sum += decimalNumber * romanregex.find(newroman)!!.value.length / second.length
+    for ((decimalNumber, romanNumber) in numbers) {
+        val romanregex = "($romanNumber+)".toRegex()
+        val findResult = romanregex.find(newroman)
+        if (findResult != null) {
+            sum += decimalNumber * findResult.value.length / romanNumber.length
             newroman = romanregex.replaceFirst(newroman, "")
         }
     }

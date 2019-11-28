@@ -58,17 +58,18 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val newsubstrings = substrings
     val map = mutableMapOf<String, Int>()
-    for (element in newsubstrings) map.put(element, 0)
+    for (element in newsubstrings) map[element] = 0
     for (line in File(inputName).readLines()) {
-        for (word in newsubstrings) {
-            val wordlower = word.toLowerCase()
-            for (element in line.split(" ")) {
-                var newelement = element
-                for (i in element.indices) {
-                    val regex = Regex("""(\Q$wordlower\E)""").find(newelement.toLowerCase())
-                    if (regex != null) {
-                        map[word] = map.getOrDefault(word, 0) + 1
-                        newelement = newelement.removeRange(regex.range.first..regex.range.first)
+        for (string in substrings) {
+            for (word in line.split(" ")) {
+                val templist = mutableListOf<String>()
+                if (word.length >= string.length) {
+                    for (i in 0..(word.length - string.length)) {
+                        templist.add(word.substring(i until i + string.length))
+                    }
+                    for (element in templist) {
+                        if (element.toLowerCase() == string.toLowerCase()) map[string] =
+                            map.getOrDefault(string, 0) + 1
                     }
                 }
             }
@@ -604,8 +605,12 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
     result.write("*" + " ".repeat(stringResult.length - digitNumber(rhv)) + rhv + "\n")
     result.write("-".repeat(stringResult.length + 1) + "\n")
     for (i in 0 until digitNumber(rhv)) {
-        if (i > 0) result.write("+" + " ".repeat(digitNumber(rhv) - i - 1) + lhv * (newRhv % 10) + "\n") else
-            result.write(" ".repeat(digitNumber(rhv)) + lhv * (newRhv % 10) + "\n")
+        val localMultiplication = lhv * (newRhv % 10)
+        if (i > 0) result.write(
+            "+" + " ".repeat(stringResult.length - digitNumber(localMultiplication) - i) +
+                    localMultiplication + "\n"
+        ) else
+            result.write(" ".repeat(digitNumber(rhv)) + localMultiplication + "\n")
         newRhv /= 10
     }
     result.write("-".repeat(stringResult.length + 1) + "\n")
