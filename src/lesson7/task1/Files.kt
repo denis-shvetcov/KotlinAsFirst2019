@@ -92,26 +92,32 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  * Исключения (жюри, брошюра, парашют) в рамках данного задания обрабатывать не нужно
  *
  */
+val compareMap = mapOf('ю' to 'у', 'я' to 'а', 'ы' to 'и') //эквиваленты
+
 fun sibilants(inputName: String, outputName: String) {
-    val compareMap = mapOf<Char, Char>('ю' to 'у', 'я' to 'а', 'ы' to 'и') //эквиваленты
     val newText = File(outputName).bufferedWriter() //файл для текста
-    var wordList = mutableListOf<String>()
     for (line in File(inputName).readLines()) {
-        wordList.clear()
+        val wordList = mutableListOf<String>()
         for (word in line.split(" ")) {
             var newword = word
             val regex = """([чщЧЩжЖшШ][юЮяЯыЫ])""".toRegex()
             while (regex.find(newword) != null) {
-                val neednottoChange = regex.find(newword)!!.value[0]//согласная, ее менять не надо
-                val needtoChange = regex.find(newword)!!.value[1] //буква, которую нужно изменить
-                if (needtoChange.isUpperCase()) newword = newword.replace(
+                val neednotToChangeMatchResult = regex.find(newword)//согласная, ее менять не надо (MatchResult)
+                val needToChangeMatchResult = regex.find(newword) //буква, которую нужно изменить (MatchResult)
+                var neednotToChange = ' ' //согласная, ее менять не надо
+                var needToChange = ' ' //буква, которую нужно изменить
+                if (needToChangeMatchResult != null && neednotToChangeMatchResult != null) {
+                    neednotToChange = neednotToChangeMatchResult.value[0]
+                    needToChange = needToChangeMatchResult.value[1]
+                }
+                if (needToChange.isUpperCase()) newword = newword.replace(
                     regex.find(newword)!!.value,
-                    (neednottoChange.toString() + compareMap[needtoChange.toLowerCase()]?.toUpperCase())
+                    (neednotToChange.toString() + compareMap[needToChange.toLowerCase()]?.toUpperCase())
                 )
                 else
                     newword = newword.replace(
                         regex.find(newword)!!.value,
-                        (neednottoChange.toString() + compareMap.getValue(needtoChange))
+                        (neednotToChange.toString() + compareMap.getValue(needToChange))
                     )
             }
             wordList.add(newword)
@@ -143,17 +149,22 @@ fun centerFile(inputName: String, outputName: String) {
     val newText = File(outputName).bufferedWriter()
     var maxlength = 0
     var newline = ""
-    for (line in File(inputName).readLines()) {
-        if (line.trim().trimIndent().length > maxlength) maxlength = line.trim().trimIndent().length
+    try {
+        for (line in File(inputName).readLines()) {
+            if (line.trim().trimIndent().length > maxlength) maxlength = line.trim().trimIndent().length
+        }
+        for (line in File(inputName).readLines()) {
+            newline = ""
+            newline += " ".repeat((maxlength - line.trim().length) / 2 - (line.trim().length - line.trim().trimIndent().length))
+            newline += line.trim().trimIndent()
+            newText.write(newline)
+            newText.newLine()
+        }
+        newText.close()
     }
-    for (line in File(inputName).readLines()) {
-        newline = ""
-        newline += " ".repeat((maxlength - line.trim().length) / 2 - (line.trim().length - line.trim().trimIndent().length))
-        newline += line.trim().trimIndent()
-        newText.write(newline)
-        newText.newLine()
+    finally {
+        newText.close()
     }
-    newText.close()
 }
 
 /**
