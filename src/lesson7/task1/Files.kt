@@ -695,14 +695,17 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             }
         }
     }
+    if (lhv/rhv==0) index = digitNumber(lhv)-1
     while (index != digitNumber(lhv)) {
         divisionCounter++ //увеличиваем счетчик делений
         //поиск делимого
         if (divisionCounter == 1) {
             divinded = lhv.toString().substring(0..index).toInt()
+            underDottedLine="$divinded"
             if (digitNumber(divinded) == digitNumber((divinded / rhv) * rhv)) {
                 result.write(" $lhv | $rhv")
                 firstLine = " $lhv | "
+                underDottedLine=" " + underDottedLine
             } else {
                 result.write("$lhv | $rhv")
                 firstLine = "$lhv | "
@@ -718,7 +721,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         result.newLine()
         subtrahendLine = "-$localQuotient"
         // цикл обрабатывает три строки: вычитаемое, пунктирная, результат вычитания, если третья строка пустая, то мы не добавляем пробелы
-        if (underDottedLine.isNotEmpty()) subtrahendLine =
+        subtrahendLine =
             (subtrahendLine.reversed() + (" ").repeat(underDottedLine.length - subtrahendLine.length)).reversed()
         //создается пунктирная строка, длина которой равна наибольшей из substrahendLine и underDottedLine,  к ней добавляются пробелы
         dottedLine = "-".repeat(maxOf(Regex("""[\s]""").replace(subtrahendLine, "").length,
