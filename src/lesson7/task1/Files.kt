@@ -60,7 +60,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val map = mutableMapOf<String, Int>()
     for (element in newsubstrings) map[element] = 0
     for (line in File(inputName).readLines()) {
-        for (string in substrings) {
+        for (string in newsubstrings) {
             for (word in line.split(" ")) {
                 val templist = mutableListOf<String>()
                 if (word.length >= string.length) {
@@ -651,16 +651,16 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val result = File(outputName).bufferedWriter()
+    var firstLine = ""
     var index = 0
     var divinded = 0
-    var localQuotient  = 0
+    var localQuotient = 0
     var divisionCounter = 0 //нужен для частного случая первого деления
     var nextDigit = 0
     var underDottedResult = 0
     var subtrahendLine = ""
     var dottedLine = ""
     var underDottedLine = ""
-    result.write(" " + lhv + " | " + rhv)
     //поиск индекса первого возможного делимого
     if (lhv > rhv) {
         for (i in 0..digitNumber(lhv)) {
@@ -673,7 +673,16 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     while (index != digitNumber(lhv)) {
         divisionCounter++ //увеличиваем счетчик делений
         //поиск делимого
-        if (divisionCounter == 1) divinded = lhv.toString().substring(0..index).toInt() else divinded = underDottedResult
+        if (divisionCounter == 1) {
+            divinded = lhv.toString().substring(0..index).toInt()
+            if (digitNumber(divinded) == digitNumber((divinded / rhv) * rhv)) {
+                result.write(" $lhv | $rhv")
+                firstLine = " $lhv | "
+            } else {
+                result.write("$lhv | $rhv")
+                firstLine = "$lhv | "
+            }
+        } else divinded = underDottedResult
         localQuotient = (divinded / rhv) * rhv
         //определение разряда, следующего за делимым, если последнее деление, то разряд = 123, то есть не существует
         if (index >= digitNumber(lhv) - 1) nextDigit = 123 else nextDigit =
@@ -691,13 +700,15 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         dottedLine = (dottedLine.reversed() + " ".repeat(subtrahendLine.length - dottedLine.length)).reversed()
         //создается строка результата вычитания, в частных случаях нужно прописывать незначащий ноль
         // также в последней строке исключается случай записи двух нулей
-        if (divinded - localQuotient == 0 && nextDigit != 123) underDottedLine = "0$underDottedResult" else underDottedLine = "$underDottedResult"
-        underDottedLine = (underDottedLine.reversed() + (" ").repeat(subtrahendLine.length - underDottedLine.length + 1)).reversed()
+        if (divinded - localQuotient == 0 && nextDigit != 123) underDottedLine = "0$underDottedResult"
+        else underDottedLine = "$underDottedResult"
+        underDottedLine =
+            (underDottedLine.reversed() + (" ").repeat(subtrahendLine.length - underDottedLine.length + 1)).reversed()
         //в последней строке пробелы не добавляются, поэтому нужно удалить лишний пробел, чтобы выровнять по правому краю
         if (index >= digitNumber(lhv) - 1) underDottedLine = underDottedLine.removeRange(0..0)
         //если делим первый раз, то второй строке нужно добавить результат частного
         if (divisionCounter == 1) {
-            result.write(subtrahendLine + " ".repeat(4 + digitNumber(lhv) - subtrahendLine.length) + lhv / rhv + "\n")
+            result.write(subtrahendLine + " ".repeat(firstLine.length - subtrahendLine.length) + lhv / rhv + "\n")
         } else result.write(subtrahendLine + "\n")
         result.write(dottedLine + "\n")
         result.write(underDottedLine)

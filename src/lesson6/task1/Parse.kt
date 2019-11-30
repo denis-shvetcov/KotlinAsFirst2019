@@ -90,23 +90,22 @@ fun main() {
  * входными данными.
  */
 fun dateStrToDigit(str: String): String {
-    if (Regex("""((?<!.)\d+\s.+\s\d+)""").find(str) == null) return ""
-    val date = str.split(" ")
-    val day = date[0].toInt()
-    var month = date[1]
-    val year = date[2].toInt()
-    if (findDigital.replace(day.toString(), "") != "" ||
-        findDigital.replace(year.toString(), "") != "" ||
-        day > 31 || (month == months[2] && day > 29) ||
-        (day == 31 && day != daysInMonth(months.indexOf(month), year))
-    ) return ""
-    if (month in months) {
-        if (day == 29 && months.indexOf(month) == 2 &&
-            daysInMonth(months.indexOf(month), year) != day
-        )
-            return "" else month = twoDigitStr(months.indexOf(month))
-    } else return ""
-    return "${twoDigitStr(day)}.$month.$year"
+    try {
+        val date = str.split(" ")
+        val day = date[0].toInt()
+        var month = date[1]
+        val year = date[2].toInt()
+        if (month in months) {
+            if (day == 29 && months.indexOf(month) == 2 && daysInMonth(months.indexOf(month), year) != day ||
+                (day == 31 && day != daysInMonth(months.indexOf(month), year)) || day > 31) return ""
+            else month = twoDigitStr(months.indexOf(month))
+        } else return ""
+        return "${twoDigitStr(day)}.$month.$year"
+    } catch (e1: NumberFormatException) {
+        return ""
+    } catch (e2: IndexOutOfBoundsException) {
+        return ""
+    }
 }
 
 /**
@@ -151,8 +150,9 @@ fun flattenPhoneNumber(phone: String): String {
     if (Regex("""[\+\-\s\d \( \)]""").replace(phone, "") != "" ||
         Regex("""(\(\))""").find(phone) != null || (Regex("""[)(]""").find(phone) != null &&
                 Regex("""(\(.*\))""").find(phone) == null) ||
-        (Regex("""[\+\-\s]""").find(phone)!=null && Regex("""[\d]""").find(phone)==null
-    )) return "" // проверка наличия лишних символов и пустых скобок
+        (Regex("""[\+\-\s]""").find(phone) != null && Regex("""[\d]""").find(phone) == null
+                )
+    ) return "" // проверка наличия лишних символов и пустых скобок
     return Regex("""[-\s()]""").replace(phone, "")
 }
 
