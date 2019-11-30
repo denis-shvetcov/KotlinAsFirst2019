@@ -525,50 +525,75 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdownToHtmlLists(inputName: String, outputName: String) {} /*{
-    var currentListType = ""
-    var currentspace = 0
-    val newList = File(outputName).bufferedWriter()
-    newList.write("<html>\n<body>\n")
+fun markdownToHtmlLists(inputName: String, outputName: String) {
+    val html = File(outputName).bufferedWriter()
+    html.write("<html>\n<body>")
+    var currentSpace = 0
+    val listUlOlLi = mutableListOf<String>()
     for (line in File(inputName).readLines()) {
-        if (Regex("""(\s+(?=\*|\.))""").find(line)?.value?.length ?: 0 > currentspace ||
-            Regex("""(\s+(?=\*|\.))""").find(line)?.value?.length ?: 0 == 0
-        ) {
-            if (Regex("""[\*\.]""").find(line)!!.value == "*") {
-                newList.write("<ul>\n")
-                if (Regex("""(\s+(?=\*|\.))""").find(line)?.value?.length ?: 0 != 0) currentspace += 4
-                currentListType = "*"
+        val spaceLengthRegex = Regex("""(\s+(?=[\*\.\d]))""").find(line)
+        val ulRegex = Regex("""(\*)""").find(line)
+        val olRegex = Regex("""(\.\d+)""").find(line)
+        if (spaceLengthRegex == null) {
+            if (ulRegex != null) {
+                html.write("<ul>\n")
+                listUlOlLi.add("</li>")
+                listUlOlLi.add("</ul>")
+                html.write("<li>\n${Regex("""[\*]""").replace(line, "")}\n")
             } else {
-                currentspace += 4
-                newList.write("<ol>\n")
-                currentListType = "."
-            }
-        } else {
-            if (Regex("""(\s+(?=\*|\.))""").find(line)?.value?.length!! ?: 0 < currentspace ||
-                Regex("""(\s+(?=\*|\.))""").find(line)?.value?.length ?: 0 == 0) {
-                if (currentListType == "*") {
-                    newList.write("</ul>\n<li>\n")
-                    currentspace -= 4
-                    currentListType = Regex("""[\*\.]""").find(line)!!.value
-                } else {
-                    currentspace -= 4
-                    newList.write("</ol>\n<li>\n")
-                    currentListType = Regex("""[\*\.]""").find(line)!!.value
+                if (olRegex != null) {
+                    html.write("<ol>\n")
+                    listUlOlLi.add("</li>")
+                    listUlOlLi.add("</ol>")
+                    html.write("<li>\n")
+                    html.write("<li>\n${Regex("""[\.\d]""").replace(line, "")}\n")
                 }
             }
         }
-        if (currentListType == ".") {
-            newList.write("<li>\n${Regex("""[\.\d]""").replace(line, "")}")
-            newList.newLine()
-        } else {
-            newList.write("<li>\n${Regex("""[\*]""").replace(line, "")}")
-            newList.newLine()
+        if (spaceLengthRegex != null && spaceLengthRegex.value.length > currentSpace) {
+            if (ulRegex != null) {
+                html.write("<ul>\n")
+                listUlOlLi.add("</li>")
+                listUlOlLi.add("</ul>")
+                html.write("<li>\n${Regex("""[\*]""").replace(line, "")}")
+            } else {
+                if (olRegex != null) {
+                    html.write("<ol>\n")
+                    listUlOlLi.add("</li>")
+                    listUlOlLi.add("</ol>")
+                    html.write("<li>\n")
+                    html.write("<li>\n${Regex("""[\.\d]""").replace(line, "")}")
+                }
+            }
+            currentSpace += 4
         }
-    }
+        if (spaceLengthRegex != null && spaceLengthRegex.value.length < currentSpace) {
+            html.write("${listUlOlLi[listUlOlLi.size - 1]}\n")
+            listUlOlLi.removeAt(listUlOlLi.size - 1)
+            html.write("${listUlOlLi[listUlOlLi.size - 1]}\n")
+            listUlOlLi.removeAt(listUlOlLi.size - 1)
+            currentSpace -= 4
+        }
+        if (spaceLengthRegex != null && spaceLengthRegex.value.length == currentSpace) {
+            html.write("<li>${Regex("""[\*\.\d]""").replace(line, "")}</li>")
+        }
+        if (spaceLengthRegex == null && listUlOlLi.isEmpty()) {
+            html.write(
+                "<li>${Regex("""[\*\.\d]""").replace(
+                    line,
+                    ""
+                )}</li>"
+            )
+        }
 
-    newList.write("</body>\n</html>")
-    newList.close()
-}*/
+    }
+    for (element in listUlOlLi.reversed()) {
+        html.write("$element\n")
+    }
+    html.write("</body>\n<html>")
+    html.close()
+}
+
 
 /**
  * Очень сложная
@@ -686,7 +711,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         localQuotient = (divinded / rhv) * rhv
         //определение разряда, следующего за делимым, если последнее деление, то разряд = 123, то есть не существует
         if (index >= digitNumber(lhv) - 1) nextDigit = 123 else nextDigit =
-            (lhv.toString()).get(index + 1).toString().toInt()
+            (lhv.toString())[index + 1].toString().toInt()
         //определение результата под пунктирной линией, если последнее деление, то не нужно умножать на 10
         if (index >= digitNumber(lhv) - 1) underDottedResult = (divinded - localQuotient) else underDottedResult =
             (divinded - localQuotient) * 10 + nextDigit
@@ -695,8 +720,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         // цикл обрабатывает три строки: вычитаемое, пунктирная, результат вычитания, если третья строка пустая, то мы не добавляем пробелы
         if (underDottedLine.isNotEmpty()) subtrahendLine =
             (subtrahendLine.reversed() + (" ").repeat(underDottedLine.length - subtrahendLine.length)).reversed()
-        //создается пунктирная строка и к ней добавляются пробелы
-        dottedLine = "-".repeat(Regex("""[\s]""").replace(subtrahendLine, "").length)
+        //создается пунктирная строка, длина которой равна наибольшей из substrahendLine и underDottedLine,  к ней добавляются пробелы
+        dottedLine = "-".repeat(maxOf(Regex("""[\s]""").replace(subtrahendLine, "").length,
+                Regex("""[\s]""").replace(underDottedLine, "").length))
         dottedLine = (dottedLine.reversed() + " ".repeat(subtrahendLine.length - dottedLine.length)).reversed()
         //создается строка результата вычитания, в частных случаях нужно прописывать незначащий ноль
         // также в последней строке исключается случай записи двух нулей

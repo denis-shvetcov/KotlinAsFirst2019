@@ -97,7 +97,8 @@ fun dateStrToDigit(str: String): String {
         val year = date[2].toInt()
         if (month in months) {
             if (day == 29 && months.indexOf(month) == 2 && daysInMonth(months.indexOf(month), year) != day ||
-                (day == 31 && day != daysInMonth(months.indexOf(month), year)) || day > 31) return ""
+                (day == 31 && day != daysInMonth(months.indexOf(month), year)) || day > 31 ||
+                months.indexOf(month) == 2 && day > 29 ) return ""
             else month = twoDigitStr(months.indexOf(month))
         } else return ""
         return "${twoDigitStr(day)}.$month.$year"
