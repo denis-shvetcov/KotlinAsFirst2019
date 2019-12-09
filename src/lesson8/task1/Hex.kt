@@ -41,8 +41,12 @@ data class HexPoint(val x: Int, val y: Int) {
      * Например, путь межу гексами 16 и 41 (см. выше) может проходить через 25, 34, 43 и 42 и имеет длину 5.
      */
     fun distance(other: HexPoint): Int {
-        val result = max(abs(x - other.x), abs((y + x / 2)) - (other.y + other.x / 2))
-        return result
+        if ((other.x - x) > 0 && (other.y - y) > 0 || (other.x - x) < 0 && (other.y - y) < 0) {
+            return abs(other.x - x) + abs(other.y - y);
+        } else {
+            return max(abs(other.x - x), abs(other.y - y));
+        }
+
     }
 
     override fun toString(): String = "$y.$x"
@@ -92,7 +96,7 @@ class HexSegment(val begin: HexPoint, val end: HexPoint) {
      * А, например, 13-26 не является "правильным" отрезком.
      */
     fun isValid(): Boolean =
-        (begin.y == end.y || begin.x == end.x || kotlin.math.abs(begin.y - end.y) == kotlin.math.abs(begin.x - end.x))
+        (begin.y == end.y || begin.x == end.x || kotlin.math.abs(begin.y - end.y) == kotlin.math.abs(begin.x - end.x)) && (begin != end)
 
     /**
      * Средняя

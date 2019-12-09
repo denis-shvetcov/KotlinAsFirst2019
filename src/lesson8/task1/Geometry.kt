@@ -87,7 +87,7 @@ data class Circle(val center: Point, val radius: Double) {
      *
      * Вернуть true, если и только если окружность содержит данную точку НА себе или ВНУТРИ себя
      */
-    fun contains(p: Point): Boolean = sqrt(sqr(p.x + center.x) + sqr(p.y + center.y)) <= radius
+    fun contains(p: Point): Boolean = p.distance(center) <= radius
 }
 
 /**
@@ -191,7 +191,7 @@ fun angleCounter(a: Point, b: Point): Double {
         if (b.y > a.y) angle = atan((b.y - a.y) / (b.x - a.x)) else angle = atan((a.y - b.y) / (a.x - b.x))
     }
     if (angle < 0) angle += PI
-    return angle
+    return angle % (2*PI)
 }
 
 /**
@@ -226,7 +226,6 @@ fun bisectorByPoints(a: Point, b: Point): Line {
     val point = circleByDiameter(Segment(a, b)).center
     val angle = angleCounter(a, b)
     val perpendicularAngel = (angle + PI / 2) % PI
-
 
     return Line(point, perpendicularAngel)
 }
