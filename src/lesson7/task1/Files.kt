@@ -3,7 +3,6 @@
 package lesson7.task1
 
 import lesson3.task1.digitNumber
-import lesson3.task1.pow10
 import java.io.File
 
 /**
@@ -106,19 +105,22 @@ fun sibilants(inputName: String, outputName: String) {
                 val needToChangeMatchResult = regex.find(newword) //буква, которую нужно изменить (MatchResult)
                 var neednotToChange = ' ' //согласная, ее менять не надо
                 var needToChange = ' ' //буква, которую нужно изменить
+                val couple = regex.find(newword)
                 if (needToChangeMatchResult != null && neednotToChangeMatchResult != null) {
                     neednotToChange = neednotToChangeMatchResult.value[0]
                     needToChange = needToChangeMatchResult.value[1]
                 }
-                if (needToChange.isUpperCase()) newword = newword.replace(
-                    regex.find(newword)!!.value,
-                    (neednotToChange.toString() + compareMap[needToChange.toLowerCase()]?.toUpperCase())
-                )
-                else
-                    newword = newword.replace(
-                        regex.find(newword)!!.value,
-                        (neednotToChange.toString() + compareMap.getValue(needToChange))
+                if (couple != null) {
+                    if (needToChange.isUpperCase()) newword = newword.replace(
+                        couple.value,
+                        (neednotToChange.toString() + compareMap[needToChange.toLowerCase()]?.toUpperCase())
                     )
+                    else
+                        newword = newword.replace(
+                            couple.value,
+                            (neednotToChange.toString() + compareMap.getValue(needToChange))
+                        )
+                }
             }
             wordList.add(newword)
         }
@@ -160,7 +162,6 @@ fun centerFile(inputName: String, outputName: String) {
             newText.write(newline)
             newText.newLine()
         }
-        newText.close()
     } finally {
         newText.close()
     }
@@ -400,30 +401,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    var newLine = ""
-    val file = File(outputName).bufferedWriter()
-    file.write("<html>\n<body>\n<p>")
-    for (line in File(inputName).readLines()) {
-        newLine = line
-        if (line.replace(" ", "") == "") file.write("</p>\n<p>")
-        while (Regex("""(\*\*)""").find(newLine) != null) {
-            newLine = newLine.replaceFirst(Regex("""(\*\*)""").find(newLine)!!.value, "<b>")
-            newLine = newLine.replaceFirst(Regex("""(\*\*)""").find(newLine)!!.value, "</b>")
-        }
-        while (Regex("""((?<!\*)\*(?!\*))""").find(newLine) != null) {
-            newLine = newLine.replaceFirst(Regex("""((?<!\*)\*(?!\*))""").find(newLine)!!.value, "<i>")
-            newLine = newLine.replaceFirst(Regex("""((?<!\*)\*(?!\*))""").find(newLine)!!.value, "</i>")
-
-        }
-        while (Regex("""(~~)""").find(newLine) != null) {
-            newLine = newLine.replaceFirst(Regex("""(~~)""").find(newLine)!!.value, "<s>")
-            newLine = newLine.replaceFirst(Regex("""(~~)""").find(newLine)!!.value, "</s>")
-        }
-        file.write(newLine)
-        file.newLine()
-    }
-    file.write("</p>\n</body>\n</html>")
-    file.close()
+    TODO()
 }
 
 /**
@@ -526,72 +504,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    val html = File(outputName).bufferedWriter()
-    html.write("<html>\n<body>")
-    var currentSpace = 0
-    val listUlOlLi = mutableListOf<String>()
-    for (line in File(inputName).readLines()) {
-        val spaceLengthRegex = Regex("""(\s+(?=[\*\.\d]))""").find(line)
-        val ulRegex = Regex("""(\*)""").find(line)
-        val olRegex = Regex("""(\.\d+)""").find(line)
-        if (spaceLengthRegex == null) {
-            if (ulRegex != null) {
-                html.write("<ul>\n")
-                listUlOlLi.add("</li>")
-                listUlOlLi.add("</ul>")
-                html.write("<li>\n${Regex("""[\*]""").replace(line, "")}\n")
-            } else {
-                if (olRegex != null) {
-                    html.write("<ol>\n")
-                    listUlOlLi.add("</li>")
-                    listUlOlLi.add("</ol>")
-                    html.write("<li>\n")
-                    html.write("<li>\n${Regex("""[\.\d]""").replace(line, "")}\n")
-                }
-            }
-        }
-        if (spaceLengthRegex != null && spaceLengthRegex.value.length > currentSpace) {
-            if (ulRegex != null) {
-                html.write("<ul>\n")
-                listUlOlLi.add("</li>")
-                listUlOlLi.add("</ul>")
-                html.write("<li>\n${Regex("""[\*]""").replace(line, "")}")
-            } else {
-                if (olRegex != null) {
-                    html.write("<ol>\n")
-                    listUlOlLi.add("</li>")
-                    listUlOlLi.add("</ol>")
-                    html.write("<li>\n")
-                    html.write("<li>\n${Regex("""[\.\d]""").replace(line, "")}")
-                }
-            }
-            currentSpace += 4
-        }
-        if (spaceLengthRegex != null && spaceLengthRegex.value.length < currentSpace) {
-            html.write("${listUlOlLi[listUlOlLi.size - 1]}\n")
-            listUlOlLi.removeAt(listUlOlLi.size - 1)
-            html.write("${listUlOlLi[listUlOlLi.size - 1]}\n")
-            listUlOlLi.removeAt(listUlOlLi.size - 1)
-            currentSpace -= 4
-        }
-        if (spaceLengthRegex != null && spaceLengthRegex.value.length == currentSpace) {
-            html.write("<li>${Regex("""[\*\.\d]""").replace(line, "")}</li>")
-        }
-        if (spaceLengthRegex == null && listUlOlLi.isEmpty()) {
-            html.write(
-                "<li>${Regex("""[\*\.\d]""").replace(
-                    line,
-                    ""
-                )}</li>"
-            )
-        }
-
-    }
-    for (element in listUlOlLi.reversed()) {
-        html.write("$element\n")
-    }
-    html.write("</body>\n<html>")
-    html.close()
+   TODO()
 }
 
 
@@ -695,17 +608,17 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             }
         }
     }
-    if (lhv/rhv==0) index = digitNumber(lhv)-1
+    if (lhv / rhv == 0) index = digitNumber(lhv) - 1
     while (index != digitNumber(lhv)) {
         divisionCounter++ //увеличиваем счетчик делений
         //поиск делимого
         if (divisionCounter == 1) {
             divinded = lhv.toString().substring(0..index).toInt()
-            underDottedLine="$divinded"
+            underDottedLine = "$divinded"
             if (digitNumber(divinded) == digitNumber((divinded / rhv) * rhv)) {
                 result.write(" $lhv | $rhv")
                 firstLine = " $lhv | "
-                underDottedLine=" " + underDottedLine
+                underDottedLine = " " + underDottedLine
             } else {
                 result.write("$lhv | $rhv")
                 firstLine = "$lhv | "
@@ -724,8 +637,12 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         subtrahendLine =
             (subtrahendLine.reversed() + (" ").repeat(underDottedLine.length - subtrahendLine.length)).reversed()
         //создается пунктирная строка, длина которой равна наибольшей из substrahendLine и underDottedLine,  к ней добавляются пробелы
-        dottedLine = "-".repeat(maxOf(Regex("""[\s]""").replace(subtrahendLine, "").length,
-                Regex("""[\s]""").replace(underDottedLine, "").length))
+        dottedLine = "-".repeat(
+            maxOf(
+                Regex("""[\s]""").replace(subtrahendLine, "").length,
+                Regex("""[\s]""").replace(underDottedLine, "").length
+            )
+        )
         dottedLine = (dottedLine.reversed() + " ".repeat(subtrahendLine.length - dottedLine.length)).reversed()
         //создается строка результата вычитания, в частных случаях нужно прописывать незначащий ноль
         // также в последней строке исключается случай записи двух нулей
