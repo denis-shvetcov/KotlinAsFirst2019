@@ -213,7 +213,7 @@ fun kingMoveNumber(start: Square, end: Square): Int {
  * Вернуть список из клеток, по которым шахматный король может быстрее  всего попасть из клетки start в клетку end.
  * Описание ходов короля см. предыдущую задачу.
  * Список всегда включает в себя клетку start. Клетка end включается, если она не совпадает со start.
- * Между ними должны находиться промежуточные клетки, по порядку от start до end.
+ * Между ними должны находиться промежуточные клетки, по порядку  от start до end.
  * Примеры: kingTrajectory(Square(3, 3), Square(3, 3)) = listOf(Square(3, 3))
  *          (здесь возможны другие варианты)
  *          kingTrajectory(Square(3, 1), Square(6, 3)) = listOf(Square(3, 1), Square(4, 2), Square(5, 2), Square(6, 3))
@@ -221,30 +221,9 @@ fun kingMoveNumber(start: Square, end: Square): Int {
  *          kingTrajectory(Square(3, 5), Square(6, 2)) = listOf(Square(3, 5), Square(4, 4), Square(5, 3), Square(6, 2))
  * Если возможно несколько вариантов самой быстрой траектории, вернуть любой из них.
  */
-fun kingTrajectory(start: Square, end: Square): List<Square> = TODO()/*{
-    var current = start
-    val positions = mutableListOf(start)
-    while (current.column != end.column && current.row != end.row) {
-        if (end.column - start.column > 0) {
-            if (end.row - start.row > 0) current = Square(current.column + 1, current.row + 1)
-            else current = Square(current.column + 1, current.row - 1)
-        } else if (end.row - start.row > 0) current = Square(current.column + 1, current.row + 1)
-        else current = Square(current.column + 1, current.row - 1)
-        positions.add(current)
-    }
-    while (current != end) {
-        if (current.row != end.row) {
-            if (end.row - current.row > 0) current = Square(current.row + 1, current.column) else current =
-                Square(current.row - 1, current.column)
-        }
-        if (current.column != end.column) {
-            if (end.column - current.column > 0) current = Square(current.row , current.column+1) else current =
-                Square(current.row, current.column+1)
-        }
-        positions.add(current)
-    }
-    return positions
-}*/
+fun kingTrajectory(start: Square, end: Square): List<Square> {
+  TODO()
+}
 
 
 /**
