@@ -204,7 +204,7 @@ fun bishopTrajectory(start: Square, end: Square): List<Square> {
  * Король может последовательно пройти через клетки (4, 2) и (5, 2) к клетке (6, 3).
  */
 fun kingMoveNumber(start: Square, end: Square): Int {
-
+    TODO()
 }
 
 /**
@@ -221,8 +221,27 @@ fun kingMoveNumber(start: Square, end: Square): Int {
  *          kingTrajectory(Square(3, 5), Square(6, 2)) = listOf(Square(3, 5), Square(4, 4), Square(5, 3), Square(6, 2))
  * Если возможно несколько вариантов самой быстрой траектории, вернуть любой из них.
  */
+
+fun checkSign(from: Int, to: Int): Int = ((to - from) / (to - from))?: 0
+
+
 fun kingTrajectory(start: Square, end: Square): List<Square> {
-  TODO()
+   /* var current = start
+    while (current != end) {
+        if (end.row != current.row && end.column != current.column) {
+            current =
+                Square(
+                    current.row + checkSign(end.row, current.row),
+                    current.column + checkSign(end.column, current.column)
+                )
+        } else {
+            if (end.row != current.row) {
+                current=
+            }
+        }
+
+    }*/
+    TODO()
 }
 
 
