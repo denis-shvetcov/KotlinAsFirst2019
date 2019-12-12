@@ -187,11 +187,9 @@ class Line(val b: Double, val angle: Double) {
 
 fun angleCounter(a: Point, b: Point): Double {
     var angle = 0.0
-    if (a.x == b.x) angle = PI / 2 else {
-        if (b.y > a.y) angle = atan((b.y - a.y) / (b.x - a.x)) else angle = atan((a.y - b.y) / (a.x - b.x))
-    }
+    if (a.x == b.x) angle = PI / 2 else angle = atan((a.y - b.y) / (a.x - b.x))
     if (angle < 0) angle += PI
-    return angle % (2*PI)
+    return angle % PI
 }
 
 /**
