@@ -226,27 +226,16 @@ fun checkSign(from: Int, to: Int): Int = ((to - from) / (to - from)) ?: 0
 
 
 fun kingTrajectory(start: Square, end: Square): List<Square> {
-    /*var current = start
-    val list = mutableListOf(start)
+    var current = start
+    val positions = mutableListOf(start)
     while (current != end) {
-        if (end.row != current.row && end.column != current.column) {
-            current =
-                Square(
-                    current.row + checkSign(end.row, current.row),
-                    current.column + checkSign(end.column, current.column)
-                )
-        } else {
-            if (end.row != current.row) {
-                current = Square(current.row + checkSign(end.row, current.row), current.column)
-            } else {
-                if (end.column != current.column)
-                    current = Square(current.row, current.column + checkSign(end.column, current.column))
-            }
-        }
-        list.add(current)
+        if (current.column < end.column) current = Square(current.column + 1, current.row)
+        if (current.column > end.column) current = Square(current.column - 1, current.row)
+        if (current.row < end.row) current = Square(current.column, current.row + 1)
+        if (current.row > end.row) current = Square(current.column, current.row - 1)
+        positions.add(current)
     }
-    return list*/
-    TODO()
+    return positions
 }
 
 

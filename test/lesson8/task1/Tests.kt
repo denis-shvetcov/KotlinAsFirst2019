@@ -124,6 +124,14 @@ class Tests {
         assertTrue(Circle(center, 1.0).contains(center))
         assertFalse(Circle(center, 2.0).contains(Point(0.0, 0.0)))
         assertTrue(Circle(Point(0.0, 3.0), 5.01).contains(Point(-4.0, 0.0)))
+        assertTrue(
+            Circle(Point(0.5369594707192504, 0.41138322895922075), 0.7676823367383679).contains(
+                Point(
+                    0.0,
+                    0.3606231005687325
+                )
+            )
+        )
     }
 
     @Test
@@ -147,6 +155,7 @@ class Tests {
     fun circleByDiameter() {
         assertEquals(Circle(Point(0.0, 1.0), 1.0), circleByDiameter(Segment(Point(0.0, 0.0), Point(0.0, 2.0))))
         assertEquals(Circle(Point(2.0, 1.5), 2.5), circleByDiameter(Segment(Point(4.0, 0.0), Point(0.0, 3.0))))
+        assertEquals(Circle(Point(1.0, 2.0), 3.0), circleByDiameter(Segment(Point(1.0, 5.0), Point(1.0, -1.0))))
     }
 
     @Test
@@ -168,6 +177,8 @@ class Tests {
         )
         val p = Point(1.0, 3.0)
         assertTrue(p.distance(Line(p, 1.0).crossPoint(Line(p, 2.0))) < 1e-5)
+
+
     }
 
     @Test
@@ -175,7 +186,7 @@ class Tests {
     fun lineBySegment() {
         assertApproxEquals(Line(Point(0.0, 0.0), 0.0), lineBySegment(Segment(Point(0.0, 0.0), Point(7.0, 0.0))))
         assertApproxEquals(Line(Point(0.0, 0.0), PI / 2), lineBySegment(Segment(Point(0.0, 0.0), Point(0.0, 8.0))))
-        assertApproxEquals(Line(Point(1.0, 1.0), PI / 4), lineBySegment(Segment(Point(1.0, 1.0), Point(3.0, 3.0))))
+
     }
 
     @Test
@@ -190,7 +201,9 @@ class Tests {
     fun bisectorByPoints() {
         assertApproxEquals(Line(Point(2.0, 0.0), PI / 2), bisectorByPoints(Point(0.0, 0.0), Point(4.0, 0.0)))
         assertApproxEquals(Line(Point(1.0, 2.0), 0.0), bisectorByPoints(Point(1.0, 5.0), Point(1.0, -1.0)))
+
     }
+
 
     @Test
     @Tag("Normal")
@@ -211,6 +224,16 @@ class Tests {
         val result = circleByThreePoints(Point(5.0, 0.0), Point(3.0, 4.0), Point(0.0, -5.0))
         assertTrue(result.center.distance(Point(0.0, 0.0)) < 1e-5)
         assertEquals(5.0, result.radius, 1e-5)
+
+        val newresult = circleByThreePoints(
+            Point(2.220446049250313e-16, -632.0),
+            Point(2.220446049250313e-16, 0.0),
+            Point(-632.0, 0.6046604095026504)
+        )
+        assertTrue(newresult.center.distance(Point(0.0, 0.0)) < 1e-5)
+        assertEquals(5.0, newresult.radius, 1e-5)
+
+
     }
 
     @Test
