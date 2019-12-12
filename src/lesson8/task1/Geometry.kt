@@ -99,6 +99,18 @@ data class Segment(val begin: Point, val end: Point) {
 
     override fun hashCode() =
         begin.hashCode() + end.hashCode()
+
+    fun center(): Point {
+
+        var center = Point(0.0, 0.0)
+        if (begin.x < end.x) center =
+            Point(begin.x + (end.x - begin.x) / 2, 0.0)
+        else center = Point(begin.x - (begin.x - end.x) / 2, 0.0)
+        if (end.y > begin.y) center =
+            Point(center.x, begin.y + (end.y - begin.y) / 2) else center =
+            Point(center.x, begin.y - (begin.y - end.y) / 2)
+        return center
+    }
 }
 
 /**
@@ -136,13 +148,8 @@ fun diameter(vararg points: Point): Segment {
  * Центр её должен находиться посередине между точками, а радиус составлять половину расстояния между ними
  */
 fun circleByDiameter(diameter: Segment): Circle {
-    var center = Point(0.0, 0.0)
-    if (diameter.begin.x < diameter.end.x) center =
-        Point(diameter.begin.x + (diameter.end.x - diameter.begin.x) / 2, 0.0)
-    else center = Point(diameter.begin.x - (diameter.begin.x - diameter.end.x) / 2, 0.0)
-    if (diameter.end.y > diameter.begin.y) center =
-        Point(center.x, diameter.begin.y + (diameter.end.y - diameter.begin.y) / 2) else center =
-        Point(center.x, diameter.begin.y - (diameter.begin.y - diameter.end.y) / 2)
+    val center = diameter.center()
+
     val radius = diameter.begin.distance(diameter.end) / 2
     return Circle(center, radius)
 }
@@ -170,7 +177,8 @@ class Line(val b: Double, val angle: Double) {
         val y = (b * sin(other.angle) - other.b * sin(angle)) / (cos(angle) * sin(other.angle) - cos(other.angle) * sin(
             angle
         ))
-        val x = (y * cos(angle) - b) / sin(angle)
+        var x = 0.0
+        if (angle != PI / 2) x = (y * cos(angle) - b) / sin(angle)
         return Point(x, y)
     }
 
@@ -221,7 +229,7 @@ fun lineByPoints(a: Point, b: Point): Line {
  * Построить серединный перпендикуляр по отрезку или по двум точкам
  */
 fun bisectorByPoints(a: Point, b: Point): Line {
-    val point = circleByDiameter(Segment(a, b)).center
+    val point = Segment(a, b).center()
     val angle = angleCounter(a, b)
     val perpendicularAngel = (angle + PI / 2) % PI
 
