@@ -178,7 +178,7 @@ class Line(val b: Double, val angle: Double) {
             angle
         ))
         var x = 0.0
-        if (angle != PI / 2) x = (y * cos(angle) - b) / sin(angle)
+        if (angle != PI) x = (y * cos(angle) - b) / sin(angle)
         return Point(x, y)
     }
 

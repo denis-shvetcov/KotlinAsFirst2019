@@ -52,7 +52,7 @@ data class Square(val column: Int, val row: Int) {
  * Если нотация некорректна, бросить IllegalArgumentException
  */
 fun square(notation: String): Square {
-    if (notation[1].toString().toInt() in 1..8) {
+    if (notation.isNotEmpty() && notation[1].toString().toInt() in 1..8) {
         return when (notation[0].toString()) {
             "a" -> Square(1, notation[1].toString().toInt())
             "b" -> Square(2, notation[1].toString().toInt())
@@ -92,12 +92,10 @@ fun square(notation: String): Square {
  * Ладья может пройти через клетку (3, 3) или через клетку (6, 1) к клетке (6, 3).
  */
 fun rookMoveNumber(start: Square, end: Square): Int {
-    try {
+    if (!start.inside() || !end.inside()) throw IllegalArgumentException() else {
         return if (start == end) 0 else {
             if (start.column != end.column && start.row != end.row) 2 else 1
         }
-    } catch (e: IllegalArgumentException) {
-        throw e
     }
 }
 
@@ -149,16 +147,15 @@ fun rookTrajectory(start: Square, end: Square): List<Square> {
  * Слон может пройти через клетку (6, 4) к клетке (3, 7).
  */
 fun bishopMoveNumber(start: Square, end: Square): Int {
-    try {
+    if (!start.inside() || !end.inside()) throw IllegalArgumentException() else {
         if (start == end) return 0
         if (abs(start.row - end.row) == abs(start.column - end.column)) return 1
         if (start.column != end.column && start.row == end.row && abs(start.column - end.column) % 2 == 0) return 2
         if (start.row != end.row && start.column == end.column && abs(start.row - end.row) % 2 == 0) return 2
         if (abs(start.column - end.column) % 2 == 1 && abs(start.row - end.row) % 2 == 1) return 3
         return -1
-    } catch (e: IllegalArgumentException) {
-        throw e
     }
+
 }
 
 /**
