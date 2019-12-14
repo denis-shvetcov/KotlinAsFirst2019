@@ -52,7 +52,7 @@ data class Square(val column: Int, val row: Int) {
  * Если нотация некорректна, бросить IllegalArgumentException
  */
 fun square(notation: String): Square {
-    if (notation.isNotEmpty() && notation[1].toString().toInt() in 1..8) {
+    if (notation.isNotEmpty() && (notation[1] != null) && notation[1].toString().toInt() in 1..8) {
         return when (notation[0].toString()) {
             "a" -> Square(1, notation[1].toString().toInt())
             "b" -> Square(2, notation[1].toString().toInt())

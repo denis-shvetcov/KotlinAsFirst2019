@@ -174,12 +174,15 @@ class Line(val b: Double, val angle: Double) {
      * Для этого необходимо составить и решить систему из двух уравнений (каждое для своей прямой)
      */
     fun crossPoint(other: Line): Point {
-        val y = (b * sin(other.angle) - other.b * sin(angle)) / (cos(angle) * sin(other.angle) - cos(other.angle) * sin(
-            angle
-        ))
-        var x = 0.0
-        if (angle != PI) x = (y * cos(angle) - b) / sin(angle)
-        return Point(x, y)
+        val det = sin(angle) * cos(other.angle) - sin(other.angle) * cos(angle)
+        val detX = -b * cos(other.angle) + other.b * cos(angle)
+        val detY = sin(angle) * other.b - b * sin(other.angle)
+        return Point(detX / det, detY / det)
+//        val y = (b * sin(other.angle) - other.b * sin(angle)) / (cos(angle) * sin(other.angle) - cos(other.angle) * sin(
+//            angle
+//        ))
+//        val x = (y * cos(angle) - b) / sin(angle)
+//        return Point(x, y)
     }
 
     override fun equals(other: Any?) = other is Line && angle == other.angle && b == other.b
@@ -274,6 +277,7 @@ fun circleByThreePoints(a: Point, b: Point, c: Point): Circle {
     val perpAB = bisectorByPoints(a, b)
     val perpAC = bisectorByPoints(a, c)
     val cross = perpAB.crossPoint(perpAC)
+    println(cross)
     return Circle(cross, a.distance(cross))
 }
 
