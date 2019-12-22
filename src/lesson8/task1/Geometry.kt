@@ -77,10 +77,13 @@ data class Circle(val center: Point, val radius: Double) {
      * расстояние между их центрами минус сумма их радиусов.
      * Расстояние между пересекающимися окружностями считать равным 0.0.
      */
-    fun distance(other: Circle): Double =
-        if (sqrt(sqr(center.x - other.center.x) + sqr(center.y - other.center.y)) > (radius + other.radius)) {
-            sqrt(sqr(center.x - other.center.x) + sqr(center.y - other.center.y)) - (radius + other.radius)
+    fun distance(other: Circle): Double {
+        val centersDistance = sqrt(sqr(center.x - other.center.x) + sqr(center.y - other.center.y))
+        val sumRadius = radius + other.radius
+        return if (centersDistance > sumRadius) {
+            centersDistance - sumRadius
         } else 0.0
+    }
 
     /**
      * Тривиальная
@@ -100,17 +103,9 @@ data class Segment(val begin: Point, val end: Point) {
     override fun hashCode() =
         begin.hashCode() + end.hashCode()
 
-    fun center(): Point {
+    fun center(): Point = Point(begin.x + (end.x - begin.x) / 2, begin.y + (end.y - begin.y) / 2)
 
-        var center = Point(0.0, 0.0)
-        if (begin.x < end.x) center =
-            Point(begin.x + (end.x - begin.x) / 2, 0.0)
-        else center = Point(begin.x - (begin.x - end.x) / 2, 0.0)
-        if (end.y > begin.y) center =
-            Point(center.x, begin.y + (end.y - begin.y) / 2) else center =
-            Point(center.x, begin.y - (begin.y - end.y) / 2)
-        return center
-    }
+
 }
 
 /**
@@ -120,25 +115,20 @@ data class Segment(val begin: Point, val end: Point) {
  * Если в множестве менее двух точек, бросить IllegalArgumentException
  */
 fun diameter(vararg points: Point): Segment {
-    try {
-        val list = mutableSetOf<Point>()
-        list.addAll(points)
-        var max1 = Point(0.0, 0.0)
-        var max2 = Point(0.0, 0.0)
-        for (p1 in points.indices) {
-            for (p2 in p1 until points.size) {
-                if (points[p2].distance(points[p1]) > max2.distance(max1)) {
-                    max2 = points[p1]
-                    max1 = points[p2]
-                }
+    if (points.size < 2) throw IllegalArgumentException()
+    var max1 = Point(0.0, 0.0)
+    var max2 = Point(0.0, 0.0)
+    var maxDistance = 0.0
+    for (p1 in points.indices) {
+        for (p2 in p1 + 1 until points.size) {
+            if (points[p2].distance(points[p1]) > maxDistance) {
+                max2 = points[p1]
+                max1 = points[p2]
+                maxDistance = max2.distance(max1)
             }
         }
-
-        return Segment(max1, max2)
-
-    } catch (e: IllegalArgumentException) {
-        throw IllegalArgumentException()
     }
+    return Segment(max1, max2)
 }
 
 /**
@@ -178,11 +168,6 @@ class Line(val b: Double, val angle: Double) {
         val detX = -b * cos(other.angle) + other.b * cos(angle)
         val detY = sin(angle) * other.b - b * sin(other.angle)
         return Point(detX / det, detY / det)
-//        val y = (b * sin(other.angle) - other.b * sin(angle)) / (cos(angle) * sin(other.angle) - cos(other.angle) * sin(
-//            angle
-//        ))
-//        val x = (y * cos(angle) - b) / sin(angle)
-//        return Point(x, y)
     }
 
     override fun equals(other: Any?) = other is Line && angle == other.angle && b == other.b
@@ -246,22 +231,20 @@ fun bisectorByPoints(a: Point, b: Point): Line {
  * Если в списке менее двух окружностей, бросить IllegalArgumentException
  */
 fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
-    try {
-        var max = Double.POSITIVE_INFINITY
-        var pair = (Circle(Point(0.0, 0.0), 0.0) to Circle(Point(0.0, 0.0), 0.0))
-        for (first in 0 until circles.size - 1) {
-            for (second in first + 1 until circles.size) {
-                if (circles[first].distance(circles[second]) < max) {
-                    max = circles[first].distance(circles[second])
-                    pair = (circles[first] to circles[second])
-                }
+    if (circles.size < 2) throw IllegalArgumentException()
+    var max = Double.POSITIVE_INFINITY
+    var pair = (Circle(Point(0.0, 0.0), 0.0) to Circle(Point(0.0, 0.0), 0.0))
+    for (first in 0 until circles.size - 1) {
+        for (second in first + 1 until circles.size) {
+            if (circles[first].distance(circles[second]) < max) {
+                max = circles[first].distance(circles[second])
+                pair = (circles[first] to circles[second])
             }
-
         }
-        return pair
-    } catch (e: IllegalArgumentException) {
-        throw IllegalArgumentException()
+
     }
+    return pair
+
 }
 
 /**

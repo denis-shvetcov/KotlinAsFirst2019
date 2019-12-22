@@ -60,15 +60,12 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     for (element in newsubstrings) map[element] = 0
     for (line in File(inputName).readLines()) {
         for (string in newsubstrings) {
+            val lowerString = string.toLowerCase()
             for (word in line.split(" ")) {
-                val templist = mutableListOf<String>()
                 if (word.length >= string.length) {
-                    for (i in 0..(word.length - string.length)) {
-                        templist.add(word.substring(i until i + string.length))
-                    }
+                    val templist = word.windowed(string.length, 1).map { item -> item.toLowerCase() }
                     for (element in templist) {
-                        if (element.toLowerCase() == string.toLowerCase()) map[string] =
-                            map.getOrDefault(string, 0) + 1
+                        if (element == lowerString) map[string] = map[string]!! + 1
                     }
                 }
             }
@@ -95,28 +92,27 @@ val compareMap = mapOf('ю' to 'у', 'я' to 'а', 'ы' to 'и') //эквива�
 
 fun sibilants(inputName: String, outputName: String) {
     val newText = File(outputName).bufferedWriter() //файл для текста
+    val regex = """([чщЧЩжЖшШ][юЮяЯыЫ])""".toRegex()
     for (line in File(inputName).readLines()) {
         val wordList = mutableListOf<String>()
         for (word in line.split(" ")) {
             var newword = word
-            val regex = """([чщЧЩжЖшШ][юЮяЯыЫ])""".toRegex()
             while (regex.find(newword) != null) {
-                val neednotToChangeMatchResult = regex.find(newword)//согласная, ее менять не надо (MatchResult)
-                val needToChangeMatchResult = regex.find(newword) //буква, которую нужно изменить (MatchResult)
+                val matchResult = regex.find(newword)//согласная, ее менять не надо (MatchResult)
                 var neednotToChange = ' ' //согласная, ее менять не надо
                 var needToChange = ' ' //буква, которую нужно изменить
                 val couple = regex.find(newword)
-                if (needToChangeMatchResult != null && neednotToChangeMatchResult != null) {
-                    neednotToChange = neednotToChangeMatchResult.value[0]
-                    needToChange = needToChangeMatchResult.value[1]
+                if (matchResult != null) {
+                    neednotToChange = matchResult.value[0]//согласная, ее менять не надо (MatchResult)
+                    needToChange = matchResult.value[1]//буква, которую нужно изменить (MatchResult)
                 }
                 if (couple != null) {
-                    if (needToChange.isUpperCase()) newword = newword.replace(
+                    newword = if (needToChange.isUpperCase()) newword.replace(
                         couple.value,
                         (neednotToChange.toString() + compareMap[needToChange.toLowerCase()]?.toUpperCase())
                     )
                     else
-                        newword = newword.replace(
+                        newword.replace(
                             couple.value,
                             (neednotToChange.toString() + compareMap.getValue(needToChange))
                         )
@@ -153,7 +149,8 @@ fun centerFile(inputName: String, outputName: String) {
     var newline = ""
     try {
         for (line in File(inputName).readLines()) {
-            if (line.trim().trimIndent().length > maxlength) maxlength = line.trim().trimIndent().length
+            val trimmedLength = line.trim().trimIndent().length
+            if (trimmedLength > maxlength) maxlength = trimmedLength
         }
         for (line in File(inputName).readLines()) {
             newline = ""
@@ -243,23 +240,22 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  *
  */
 fun top20Words(inputName: String): Map<String, Int> {
-    var words = mutableMapOf<String, Int>()
-    var tempList = listOf<String>()
+    val words = mutableMapOf<String, Int>()
     val excessKey = mutableListOf<String>() //лишние ключи
-    var counter = 0
+    val regex =Regex("""([a-zA-Zа-яА-ЯёЁ]+)""")
     for (line in File(inputName).readLines()) {
-        tempList = emptyList()
-        if (Regex("""([a-zA-Zа-яА-ЯёЁ]+)""").find(line) != null)
-            tempList = Regex("""([a-zA-Zа-яА-ЯёЁ]+)""").findAll(line)
-                .toList().map { it.value.toLowerCase() }
+        var tempList = emptyList<String>()
+        if (regex.find(line) != null)
+            tempList = regex.findAll(line).toList().map { it.value.toLowerCase() }
         for (element in tempList) {
             words[element] = words.getOrDefault(element, 0) + 1
 
         }
     }
-    words = words.toList().sortedBy { (_, value) -> value }.toMap().toMutableMap()
-    for ((name, _) in words) excessKey.add(name)
-    return if (words.size < 20) words else words - excessKey.subList(0, excessKey.size - 20)
+
+    val sortedMap = words.toList().sortedBy { (_, value) -> value }.asReversed().toMap()
+    for ((name, _) in sortedMap) excessKey.add(name)
+    return if (sortedMap.size < 20) sortedMap else sortedMap - excessKey.subList(20, excessKey.size)
 }
 
 /**
@@ -337,11 +333,10 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     var longList = mutableListOf<String>()
     val file = File(outputName).bufferedWriter()
-    val setOfLetters = mutableSetOf<Char>()
     var maxlength = 0
     for (word in File(inputName).readLines()) {
-        setOfLetters.clear()
-        word.toLowerCase().map { setOfLetters.add(it) }
+        val setOfLetters = mutableSetOf<Char>()
+        word.forEach { setOfLetters.add(it.toLowerCase()) }
         if (setOfLetters.size == word.length && word.length == maxlength) {
             longList.add(word)
         } else {
@@ -504,7 +499,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-   TODO()
+    TODO()
 }
 
 
